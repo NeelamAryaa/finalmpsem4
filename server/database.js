@@ -11,7 +11,31 @@ const con = createConnection({
   database: "cbt",
 });
 
-// app.use(cors());
+app.use(cors());
+
+// All Apis
+
+app.get("/api/getAllPaper", (req, res) => {
+  con.query(
+    `select q.qp_id, p.paper_name, q.year, p.total_ques, p.total_marks, p.total_time
+    from cbt.question_paper q inner join papers p on q.p_id=p.ppr_id`,
+    (err, result) => {
+      if (err) console.log(err);
+      res.send(result);
+    }
+  );
+});
+
+app.get(`/api/getPaper/:id`, (req, res) => {
+  con.query(
+    `select q.qid, q.question, q.option1, q.option2, q.option3, q.option4, s.section_name from questions q  
+    inner join sections s on q.section_id=s.id and q.paper_id=${req.params.id} `,
+    (err, result) => {
+      if (err) console.log(err);
+      res.send(result);
+    }
+  );
+});
 
 app.get("/api/getAllQuestions", (req, res) => {
   con.query(`select * from questions`, (err, result) => {
@@ -23,6 +47,7 @@ app.get("/api/getAllQuestions", (req, res) => {
   console.log("result");
 });
 
+// initial testing
 // con.query(`select * from questions`, (err, res, fields) => {
 //   if (err) {
 //     return console.log(err);
