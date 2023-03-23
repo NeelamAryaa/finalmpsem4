@@ -117,7 +117,7 @@ const QuesScreenRightPanel = (props) => {
         </div>
       </div>
       <div className="container-fluid text-center">
-        <Link to="examsummary">
+        <Link to="/examsummary">
           <button type="button" className="btn btn-success my-3">
             Submit
           </button>

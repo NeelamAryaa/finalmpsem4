@@ -3,6 +3,10 @@ import { connect } from "react-redux";
 import { Link } from "react-router-dom";
 
 class ExamSummary extends Component {
+  goBack = () => {
+    console.log(this.props.history);
+  };
+
   getCount = (sec) => {
     const ques = this.props.Questions;
     let num_of_ans, num_of_visit, num_of_review;
@@ -79,9 +83,15 @@ class ExamSummary extends Component {
                 Yes
               </button>
             </Link>
-            <button type="button" className="btn btn-secondary ">
+            {/* <Link to="/questionscreen"> */}
+            <button
+              type="button"
+              className="btn btn-secondary "
+              onClick={this.goBack}
+            >
               No
             </button>
+            {/* </Link> */}
           </div>
         </div>
       </div>

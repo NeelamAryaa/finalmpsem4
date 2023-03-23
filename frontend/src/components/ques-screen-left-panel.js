@@ -176,8 +176,7 @@ class QuesScreenLeftPanel extends Component {
             {
               <button
                 type="button"
-                className="btn btn-success
-                "
+                className="btn btn-success"
                 onClick={this.onClickSaveAndNext}
               >
                 Save and Next

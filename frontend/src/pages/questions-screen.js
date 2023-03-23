@@ -1,4 +1,7 @@
 import React, { Component, Fragment } from "react";
+
+import axios from "axios";
+
 import QuesScreenLeftPanel from "../components/ques-screen-left-panel";
 import QuesScreenRightPanel from "../components/ques-screen-right-panel";
 import "../App.css";

@@ -11,7 +11,7 @@ const con = createConnection({
   database: "cbt",
 });
 
-app.use(cors());
+// app.use(cors());
 
 app.get("/api/getAllQuestions", (req, res) => {
   con.query(`select * from questions`, (err, result) => {

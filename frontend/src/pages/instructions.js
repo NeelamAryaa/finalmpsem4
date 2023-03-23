@@ -208,7 +208,7 @@ class Instructions extends Component {
         </div>
         {this.state.checkBoxError ? (
           <div className="text-danger ps-3">
-            {" "}
+            {/* {" "} */}
             *You must agree before go ahead.
           </div>
         ) : null}
