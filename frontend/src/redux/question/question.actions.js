@@ -7,7 +7,35 @@ import {
   CHANGE_QUESTION,
   UPDATE_SECTION,
   IS_VISITED,
+  SET_PAPER,
 } from "./question.types";
+
+export const SetQuestionPaper = (ppr) => {
+  // let ques = { ...questions };
+
+  // console.log(INITIAL_STATE.answerArray);
+
+  return (dispatch, getState) => {
+    const { currentIndex, currentSection, answerArray } = getState().index;
+    const keys = Object.keys(ppr);
+
+    keys.forEach((key) => {
+      ppr[key].forEach((ques) => {
+        ques.isVisited = false;
+        ques.isReviewed = false;
+        ques.isAnswered = false;
+      });
+    });
+
+    ppr[currentSection][currentIndex].isVisited = true;
+
+    for (const key in ppr) {
+      answerArray.push(new Array(ppr[key].length).fill(-1));
+    }
+
+    dispatch({ type: SET_PAPER, payload: ppr });
+  };
+};
 
 export const NextQuestion = () => {
   return (dispatch, getState) => {

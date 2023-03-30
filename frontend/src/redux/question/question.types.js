@@ -1,6 +1,7 @@
 export const UPDATE_CURRENT_INDEX = "UPDATE_CURRENT_INDEX";
 export const ANSWER = "ANSWER";
 export const NEXT_QUESTION = "NEXT_QUESTION";
+export const SET_PAPER = "SET_PAPER";
 export const UNCHECKED = "UNCHECKED";
 export const UPDATE_QUES_ARRAY = "UPDATE_QUES_ARRAY";
 export const CHANGE_QUESTION = "CHANGE_QUESTION";

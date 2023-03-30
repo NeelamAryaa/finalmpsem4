@@ -1,17 +1,23 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
+import { connect } from "react-redux";
 
 import { Link } from "react-router-dom";
 
-const Card = () => {
+import {
+  SetQuestionPaper,
+  UpdateCurrentSection,
+} from "../redux/question/question.actions";
+
+const Card = (props) => {
   const [allQuestionPapers, setAllQuestionPaper] = useState([]);
-  const [questionPapers, setQuestionPaper] = useState([]);
+  // const [currentSection, setCurrentSection] = useState(null);
 
   useEffect(() => {
     axios
       .get("http://localhost:8080/api/getAllPaper")
       .then((res) => {
-        console.log(res.data);
+        // console.log(res.data);
         setAllQuestionPaper(res.data);
       })
       .catch((err) => {
@@ -21,15 +27,33 @@ const Card = () => {
 
   const getAllquestionsCurrentPaper = (id) => {
     axios
-      .get("http://localhost:8080/api/getPaper")
+      .get(`http://localhost:8080/api/getPaper/${id}`)
       .then((res) => {
         console.log(res.data);
-        setQuestionPaper(res.data);
+        console.log(props);
+        props.SetQuestionPaper(res.data);
+        console.log(res.data);
+
+        props.UpdateCurrentSection(Object.keys(res.data)[0]);
       })
       .catch((err) => {
         console.log(err);
       });
+
+    console.log("im getallquesfunction");
   };
+
+  // const getSection = (id) => {
+  //   axios
+  //     .get(`http://localhost:8080/api/getSections/${id}`)
+  //     .then((res) => {
+  //       console.log(res.data);
+  //       props.SetQuestionPaper(res.data);
+  //     })
+  //     .catch((err) => {
+  //       console.log(err);
+  //     });
+  // };
 
   return (
     <>
@@ -66,4 +90,11 @@ const Card = () => {
   );
 };
 
-export default Card;
+const mapDispatchToprops = (dispatch) => {
+  return {
+    SetQuestionPaper: (ppr) => dispatch(SetQuestionPaper(ppr)),
+    UpdateCurrentSection: (sec) => dispatch(UpdateCurrentSection(sec)),
+  };
+};
+
+export default connect(null, mapDispatchToprops)(Card);

@@ -1,7 +1,5 @@
 import React, { Component, Fragment } from "react";
 
-import axios from "axios";
-
 import QuesScreenLeftPanel from "../components/ques-screen-left-panel";
 import QuesScreenRightPanel from "../components/ques-screen-right-panel";
 import "../App.css";
@@ -20,16 +18,7 @@ class QuestionsScreen extends Component {
     checkedOption: -1,
   };
 
-  componentDidMount = () => {
-    axios
-      .get("http://localhost:8080/api/getAllQuestions")
-      .then((res) => {
-        console.log(res.data);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
+  componentDidMount = () => {};
 
   updateCheckedOption = (value) => {
     this.setState({ checkedOption: value });
