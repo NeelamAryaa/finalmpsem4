@@ -1,96 +1,62 @@
 import {
   UPDATE_CURRENT_INDEX,
   ANSWER,
-  NEXT_QUESTION,
+  IS_ANSWERED,
   UNCHECKED,
   UPDATE_QUES_ARRAY,
   CHANGE_QUESTION,
   UPDATE_SECTION,
   IS_VISITED,
   SET_PAPER,
+  INITIAL_ANSWER,
 } from "./question.types";
 
 export const SetQuestionPaper = (ppr) => {
-  // let ques = { ...questions };
-
-  // console.log(INITIAL_STATE.answerArray);
-
   return (dispatch, getState) => {
     const { currentIndex, currentSection, answerArray } = getState().index;
+
+    const ans = {};
     const keys = Object.keys(ppr);
 
     keys.forEach((key) => {
       ppr[key].forEach((ques) => {
+        console.log(ques);
         ques.isVisited = false;
         ques.isReviewed = false;
         ques.isAnswered = false;
+        ans[ques.qid] = -1;
+        console.log(ans);
       });
     });
 
     ppr[currentSection][currentIndex].isVisited = true;
 
-    for (const key in ppr) {
-      answerArray.push(new Array(ppr[key].length).fill(-1));
-    }
-
     dispatch({ type: SET_PAPER, payload: ppr });
+    dispatch({ type: INITIAL_ANSWER, payload: ans });
   };
 };
 
-export const NextQuestion = () => {
+export const SetAnswer = (qid, idx) => {
   return (dispatch, getState) => {
-    const { questions, currentIndex, currentSection, answerArray } =
+    const { answers } = getState().index;
+    const ans = { ...answers };
+
+    ans[qid] = idx;
+
+    console.log("=============setans action", ans);
+
+    dispatch({ type: ANSWER, payload: ans });
+  };
+};
+
+export const Unchecked = (qid) => {
+  return (dispatch, getState) => {
+    const { questions, currentIndex, answers, currentSection } =
       getState().index;
     const ques = { ...questions };
-    const answers = [...answerArray];
-    console.log(answers);
-    // console.log(currentSection);
-
-    //   if (
-    //     Object.keys(questions).length ===
-    //     Object.keys(questions).indexOf(currentSection) + 1
-    //   ) {
-    if (
-      answers[Object.keys(questions).indexOf(currentSection)][currentIndex] !==
-      -1
-    ) {
-      ques[currentSection][currentIndex].isAnswered = true;
-      dispatch({ type: NEXT_QUESTION, payload: ques });
-    }
-    //   } else {
-    //     if (questions[currentSection].length - 1 > currentIndex) {
-    //       ques[currentSection][currentIndex + 1].isVisited = true;
-    //     }
-    //     dispatch({ type: UPDATE_CURRENT_INDEX, payload: 1 });
-    //     dispatch({ type: NEXT_QUESTION, payload: ques });
-    //     if (
-    //       answers[Object.keys(questions).indexOf(currentSection)][
-    //         currentIndex
-    //       ] !== -1
-    //     ) {
-    //       console.log(answers);
-    //       console.log(Object.keys(questions).indexOf(currentSection));
-    //       ques[currentSection][currentIndex - 1].isAnswered = true;
-    //       dispatch({ type: NEXT_QUESTION, payload: ques });
-    //     }
-    //   }
-  };
-};
-
-export const SetAnswer = (idx) => {
-  return (dispatch) => {
-    dispatch({ type: ANSWER, payload: idx });
-  };
-};
-
-export const Unchecked = () => {
-  return (dispatch, getState) => {
-    const { questions, currentIndex, answerArray, currentSection } =
-      getState().index;
-    const ques = { ...questions };
-    const ans = [...answerArray];
+    const ans = { ...answers };
     ques[currentSection][currentIndex].isAnswered = false;
-    ans[Object.keys(questions).indexOf(currentSection)][currentIndex] = -1;
+    ans[qid] = -1;
     dispatch({ type: UNCHECKED, payload: { ques: ques, ans: ans } });
   };
 };
@@ -132,5 +98,14 @@ export const IsVisited = () => {
     const ques = { ...questions };
     ques[currentSection][currentIndex].isVisited = true;
     dispatch({ type: IS_VISITED, payload: ques });
+  };
+};
+
+export const IsAnswered = () => {
+  return (dispatch, getState) => {
+    const { questions, currentSection, currentIndex } = getState().index;
+    const ques = { ...questions };
+    ques[currentSection][currentIndex].isAnswered = true;
+    dispatch({ type: IS_ANSWERED, payload: ques });
   };
 };

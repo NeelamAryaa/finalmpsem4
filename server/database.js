@@ -39,8 +39,8 @@ const groupBy = (array, key) => {
 
 app.get(`/api/getPaper/:id`, (req, res) => {
   con.query(
-    `select q.qid, q.question, q.option1, q.option2, q.option3, q.option4, s.section_name from questions q  
-    inner join sections s on q.section_id=s.id and q.paper_id=${req.params.id} `,
+    `select q.qid, q.question, q.option1, q.option2, q.option3, q.option4, q.options, s.section_name from questions q  
+    inner join sections s on q.section_id=s.id and q.qpaper_id=${req.params.id} `,
     (err, rslt) => {
       if (err) console.log(err);
 

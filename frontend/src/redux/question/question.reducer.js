@@ -1,13 +1,14 @@
 import {
   UPDATE_CURRENT_INDEX,
   ANSWER,
-  NEXT_QUESTION,
+  IS_ANSWERED,
   UNCHECKED,
   UPDATE_QUES_ARRAY,
   CHANGE_QUESTION,
   UPDATE_SECTION,
   IS_VISITED,
   SET_PAPER,
+  INITIAL_ANSWER,
 } from "./question.types";
 
 // const questions = {
@@ -81,9 +82,9 @@ import {
 // };
 
 const INITIAL_STATE = {
-  questions: { m: [{ a: 1 }], e: [{ b: 2 }, { c: 2 }] },
+  questions: {},
   currentIndex: 0,
-  answerArray: [],
+  answers: {},
   currentSection: null,
 };
 
@@ -94,8 +95,14 @@ const reducer = (state = INITIAL_STATE, action) => {
         ...state,
         questions: action.payload,
       };
+    case INITIAL_ANSWER:
+      console.log("paylod=====", action.payload);
+      return {
+        ...state,
+        answers: action.payload,
+      };
 
-    case NEXT_QUESTION:
+    case IS_ANSWERED:
       return {
         ...state,
         questions: action.payload,
@@ -108,22 +115,17 @@ const reducer = (state = INITIAL_STATE, action) => {
       };
 
     case ANSWER:
-      const newarray = [...state.answerArray];
-      // console.log(newarray);
-      newarray[Object.keys(state.questions).indexOf(state.currentSection)][
-        state.currentIndex
-      ] = action.payload;
-
+      console.log(action.payload);
       return {
         ...state,
-        answerArray: newarray,
+        answers: action.payload,
       };
 
     case UNCHECKED:
       return {
         ...state,
         questions: action.payload.ques,
-        answerArray: action.payload.ans,
+        answers: action.payload.ans,
       };
 
     case UPDATE_QUES_ARRAY:

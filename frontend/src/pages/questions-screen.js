@@ -5,7 +5,6 @@ import QuesScreenRightPanel from "../components/ques-screen-right-panel";
 import "../App.css";
 import { connect } from "react-redux";
 import {
-  NextQuestion,
   SetAnswer,
   Unchecked,
   MarkForReview,
@@ -18,16 +17,8 @@ class QuestionsScreen extends Component {
     checkedOption: -1,
   };
 
-  componentDidMount = () => {};
-
-  updateCheckedOption = (value) => {
-    this.setState({ checkedOption: value });
-  };
-
-  onClickSaveAndNext = () => {
-    this.setState({ checkedOption: -1 });
-
-    this.props.NextQuestion();
+  updateCheckedOption = (idx) => {
+    this.setState({ checkedOption: idx });
   };
 
   onChangeQues = (idx) => {
@@ -35,8 +26,9 @@ class QuestionsScreen extends Component {
     this.props.ChangeQuestion(idx);
   };
 
-  clearResponse = () => {
-    this.props.Unchecked();
+  clearResponse = (qid) => {
+    this.props.Unchecked(qid);
+    this.props.SetAnswer(qid, -1);
   };
 
   render() {
@@ -52,16 +44,12 @@ class QuestionsScreen extends Component {
         <div className="row  mx-0">
           <QuesScreenLeftPanel
             questions={this.props.questions}
-            answerArray={this.props.answerArray}
-            currentIndex={this.props.currentIndex}
+            answers={this.props.answers}
             MarkForReview={this.props.MarkForReview}
             clearResponse={this.clearResponse}
-            onClickSaveAndNext={this.onClickSaveAndNext}
             SetAnswer={this.props.SetAnswer}
             updateCheckedOption={this.updateCheckedOption}
             checkedOption={this.state.checkedOption}
-            IsVisited={this.props.IsVisited}
-            NextQuestion={this.props.NextQuestion}
           />
           <QuesScreenRightPanel
             questions={this.props.questions}
@@ -77,21 +65,18 @@ class QuestionsScreen extends Component {
 
 const mapStateToProps = (state) => {
   return {
-    currentIndex: state.index.currentIndex,
     questions: state.index.questions,
-    answerArray: state.index.answerArray,
+    answers: state.index.answers,
     currentSection: state.index.currentSection,
   };
 };
 
 const mapDispatchToprops = (dispatch) => {
   return {
-    NextQuestion: () => dispatch(NextQuestion()),
-    SetAnswer: (idx) => dispatch(SetAnswer(idx)),
-    Unchecked: () => dispatch(Unchecked()),
+    Unchecked: (qid) => dispatch(Unchecked(qid)),
     MarkForReview: () => dispatch(MarkForReview()),
     ChangeQuestion: (idx) => dispatch(ChangeQuestion(idx)),
-    IsVisited: () => dispatch(IsVisited()),
+    SetAnswer: (qid, idx) => dispatch(SetAnswer(qid, idx)),
   };
 };
 

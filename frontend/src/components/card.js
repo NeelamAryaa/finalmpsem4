@@ -7,6 +7,7 @@ import { Link } from "react-router-dom";
 import {
   SetQuestionPaper,
   UpdateCurrentSection,
+  InitialSetAnswer,
 } from "../redux/question/question.actions";
 
 const Card = (props) => {
@@ -26,21 +27,23 @@ const Card = (props) => {
   }, []);
 
   const getAllquestionsCurrentPaper = (id) => {
+    console.log("question paper id", id);
     axios
       .get(`http://localhost:8080/api/getPaper/${id}`)
       .then((res) => {
-        console.log(res.data);
+        // console.log(res.data);
         console.log(props);
-        props.SetQuestionPaper(res.data);
-        console.log(res.data);
-
         props.UpdateCurrentSection(Object.keys(res.data)[0]);
+        props.SetQuestionPaper(res.data);
+        // props.InitialSetAnswer();
+        // console.log(res.data);
       })
       .catch((err) => {
         console.log(err);
       });
 
     console.log("im getallquesfunction");
+    console.log(props.questions);
   };
 
   // const getSection = (id) => {
@@ -90,10 +93,17 @@ const Card = (props) => {
   );
 };
 
+// const mapStateToProps = (state) => {
+//   return {
+//     questions: state.index.questions,
+//   };
+// };
+
 const mapDispatchToprops = (dispatch) => {
   return {
     SetQuestionPaper: (ppr) => dispatch(SetQuestionPaper(ppr)),
     UpdateCurrentSection: (sec) => dispatch(UpdateCurrentSection(sec)),
+    // InitialSetAnswer: () => dispatch(InitialSetAnswer()),
   };
 };
 

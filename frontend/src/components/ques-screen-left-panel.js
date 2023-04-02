@@ -3,6 +3,9 @@ import { connect } from "react-redux";
 import {
   UpdateCurrentSection,
   UpdateCurrentIndex,
+  SetAnswer,
+  IsAnswered,
+  IsVisited,
 } from "../redux/question/question.actions";
 
 class QuesScreenLeftPanel extends Component {
@@ -18,23 +21,25 @@ class QuesScreenLeftPanel extends Component {
     this.props.updateCheckedOption(idx);
   };
 
-  clearResponse = () => {
-    this.props.updateCheckedOption(-1);
-    this.props.clearResponse();
-  };
+  // clearResponse = (qid) => {
+  //   // this.props.updateCheckedOption(-1);
 
-  onClickSaveAndNext = () => {
-    this.props.SetAnswer(this.props.checkedOption);
-    this.props.NextQuestion();
+  //   this.props.clearResponse(qid);
+  // };
+
+  onClickSaveAndNext = (qid) => {
+    if (this.props.checkedOption !== -1) {
+      this.props.SetAnswer(qid, this.props.checkedOption);
+      this.props.IsAnswered();
+    }
+    this.props.updateCheckedOption(-1);
 
     if (
       this.props.questions[this.props.currentSection].length - 1 >
       this.props.currentIndex
     ) {
       this.props.UpdateCurrentIndex(this.props.currentIndex + 1);
-      this.props.questions[this.props.currentSection][
-        this.props.currentIndex + 1
-      ].isVisited = true;
+      this.props.IsVisited();
     } else {
       this.props.UpdateCurrentIndex(0);
       const a =
@@ -48,10 +53,6 @@ class QuesScreenLeftPanel extends Component {
         this.props.IsVisited();
       }
     }
-
-    this.props.onClickSaveAndNext();
-    this.props.updateCheckedOption(-1);
-    console.log(this.props.currentSection);
   };
 
   getQuestion = () => {
@@ -80,6 +81,12 @@ class QuesScreenLeftPanel extends Component {
   };
 
   render() {
+    const qid =
+      this.props.questions[this.props.currentSection][this.props.currentIndex]
+        .qid;
+
+    // const ans = this.props.answers;
+    // console.log(ans[qid]);
     return (
       <div className="col-9 px-0">
         <div className=" mx-0">
@@ -127,7 +134,7 @@ class QuesScreenLeftPanel extends Component {
             this.props.currentIndex
               ? this.props.questions[this.props.currentSection][
                   this.props.currentIndex
-                ].option.map((opt, idx) => (
+                ].options.map((opt, idx) => (
                   <div class="form-check">
                     <input
                       class="form-check-input"
@@ -138,12 +145,9 @@ class QuesScreenLeftPanel extends Component {
                       checked={
                         this.props.checkedOption !== -1
                           ? idx === this.props.checkedOption
-                          : idx ===
-                            this.props.answerArray[
-                              Object.keys(this.props.questions).indexOf(
-                                this.props.currentSection
-                              )
-                            ][this.props.currentIndex]
+                          : // :
+                            idx === this.props.answers[qid]
+                        // false
                       }
                     />
                     <label class="form-check-label" for="flexRadioDefault1">
@@ -167,7 +171,7 @@ class QuesScreenLeftPanel extends Component {
             <button
               type="button"
               className="btn btn-primary "
-              onClick={this.clearResponse}
+              onClick={() => this.props.clearResponse(qid)}
             >
               Clear Response
             </button>
@@ -177,7 +181,7 @@ class QuesScreenLeftPanel extends Component {
               <button
                 type="button"
                 className="btn btn-success"
-                onClick={this.onClickSaveAndNext}
+                onClick={() => this.onClickSaveAndNext(qid)}
               >
                 Save and Next
               </button>
@@ -193,6 +197,7 @@ const mapStateToProps = (state) => {
   return {
     currentSection: state.index.currentSection,
     currentIndex: state.index.currentIndex,
+    answers: state.index.answers,
   };
 };
 
@@ -200,6 +205,8 @@ const mapDispatchToprops = (dispatch) => {
   return {
     UpdateCurrentSection: (sec) => dispatch(UpdateCurrentSection(sec)),
     UpdateCurrentIndex: (value) => dispatch(UpdateCurrentIndex(value)),
+    IsVisited: () => dispatch(IsVisited()),
+    IsAnswered: () => dispatch(IsAnswered()),
   };
 };
 
