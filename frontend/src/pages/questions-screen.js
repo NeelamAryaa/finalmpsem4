@@ -27,8 +27,9 @@ class QuestionsScreen extends Component {
   };
 
   clearResponse = (qid) => {
+    this.setState({ checkedOption: -1 });
     this.props.Unchecked(qid);
-    this.props.SetAnswer(qid, -1);
+    // this.props.SetAnswer(qid, -1);
   };
 
   render() {

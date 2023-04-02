@@ -1,10 +1,15 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import { Link } from "react-router-dom";
+import axios from "axios";
 
 class ExamSummary extends Component {
-  goBack = () => {
-    console.log(this.props.history);
+  // goBack = () => {
+  //   console.log(this.props.history);
+  // };
+
+  calulateScore = () => {
+    axios.post();
   };
 
   getCount = (sec) => {
@@ -79,19 +84,23 @@ class ExamSummary extends Component {
           <div className="fs-4">Are you sure to submit your test?</div>
           <div className="m-2">
             <Link to="/score-screen">
-              <button type="button" className="btn btn-primary me-2">
+              <button
+                type="button"
+                className="btn btn-primary me-2"
+                onClick={this.calulateScore()}
+              >
                 Yes
               </button>
             </Link>
-            {/* <Link to="/questionscreen"> */}
-            <button
-              type="button"
-              className="btn btn-secondary "
-              onClick={this.goBack}
-            >
-              No
-            </button>
-            {/* </Link> */}
+            <Link to="/questionscreen">
+              <button
+                type="button"
+                className="btn btn-secondary "
+                // onClick={this.goBack}
+              >
+                No
+              </button>
+            </Link>
           </div>
         </div>
       </div>
@@ -102,6 +111,7 @@ class ExamSummary extends Component {
 const mapStateToProps = (state) => {
   return {
     Questions: state.index.questions,
+    answers: state.index.answers,
   };
 };
 

@@ -49,6 +49,7 @@ export const SetAnswer = (qid, idx) => {
   };
 };
 
+// unchecked means clear response
 export const Unchecked = (qid) => {
   return (dispatch, getState) => {
     const { questions, currentIndex, answers, currentSection } =

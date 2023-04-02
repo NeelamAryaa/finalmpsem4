@@ -26,8 +26,6 @@ app.get("/api/getAllPaper", (req, res) => {
   );
 });
 
-//
-
 const groupBy = (array, key) => {
   return array.reduce((result, currentValue) => {
     (result[currentValue[key]] = result[currentValue[key]] || []).push(
@@ -37,31 +35,61 @@ const groupBy = (array, key) => {
   }, {});
 };
 
+// get questions of currentPaper
 app.get(`/api/getPaper/:id`, (req, res) => {
   con.query(
-    `select q.qid, q.question, q.option1, q.option2, q.option3, q.option4, q.options, s.section_name from questions q  
-    inner join sections s on q.section_id=s.id and q.qpaper_id=${req.params.id} `,
-    (err, rslt) => {
-      if (err) console.log(err);
-
-      const r = groupBy(rslt, "section_name");
-      // console.log(r);
-
-      res.send(r);
-    }
-  );
-});
-
-app.get(`/api/getSections/:id`, (req, res) => {
-  con.query(
-    `select s.section_name as section from sections s where s.paper_id=${req.params.id}`,
+    `select ques.qid, ques.question, ques.options, s.section_name from ques_in_quespaper qp  
+    inner join questions ques on qp.ques_id=ques.qid 
+    inner join section s on ques.sec_id=s.id
+    where qp.q_ppr_id=${req.params.id}  `,
     (err, result) => {
       if (err) console.log(err);
-      res.send(result);
+
+      const rsult = groupBy(result, "section_name");
+      // console.log(r);
+
+      res.send(rsult);
     }
   );
 });
 
+// ===============previous code===================
+// const groupBy = (array, key) => {
+//   return array.reduce((result, currentValue) => {
+//     (result[currentValue[key]] = result[currentValue[key]] || []).push(
+//       currentValue
+//     );
+//     return result;
+//   }, {});
+// };
+
+// app.get(`/api/getPaper/:id`, (req, res) => {
+//   con.query(
+//     `select q.qid, q.question, q.option1, q.option2, q.option3, q.option4, q.options, s.section_name from questions q
+//     inner join sections s on q.section_id=s.id and q.qpaper_id=${req.params.id} `,
+//     (err, rslt) => {
+//       if (err) console.log(err);
+
+//       const r = groupBy(rslt, "section_name");
+//       // console.log(r);
+
+//       res.send(r);
+//     }
+//   );
+// });
+
+// app.get(`/api/getSections/:id`, (req, res) => {
+//   con.query(
+//     `select s.section_name as section from sections s where s.paper_id=${req.params.id}`,
+//     (err, result) => {
+//       if (err) console.log(err);
+//       res.send(result);
+//     }
+//   );
+// });
+// // ===============previous code ends===================
+
+// ===============================================
 // app.get(`/api/getPaper/:id`, (req, res) => {
 //   con.query(
 //     `select q.qid, q.question, q.option1, q.option2, q.option3, q.option4, s.section_name from questions q
@@ -108,6 +136,7 @@ app.get(`/api/getSections/:id`, (req, res) => {
 // });
 
 // module.exports = con;
+// =====================================================
 
 app.listen(8080, "0.0.0.0", (err) => {
   if (err) console.log(err);
