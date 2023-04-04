@@ -9,6 +9,9 @@ import {
   IS_VISITED,
   SET_PAPER,
   INITIAL_ANSWER,
+  SET_PAPER_ID,
+  SET_SCORE,
+  SET_PAPER_TYPE_ID,
 } from "./question.types";
 
 // const questions = {
@@ -82,14 +85,27 @@ import {
 // };
 
 const INITIAL_STATE = {
+  paperTypeID: -1,
+  paperID: -1,
   questions: {},
   currentIndex: 0,
   answers: {},
   currentSection: null,
+  score: 0,
 };
 
 const reducer = (state = INITIAL_STATE, action) => {
   switch (action.type) {
+    case SET_PAPER_TYPE_ID:
+      return {
+        ...state,
+        paperTypeID: action.payload,
+      };
+    case SET_PAPER_ID:
+      return {
+        ...state,
+        paperID: action.payload,
+      };
     case SET_PAPER:
       return {
         ...state,
@@ -149,6 +165,11 @@ const reducer = (state = INITIAL_STATE, action) => {
       return {
         ...state,
         questions: action.payload,
+      };
+    case SET_SCORE:
+      return {
+        ...state,
+        score: action.payload,
       };
 
     default:

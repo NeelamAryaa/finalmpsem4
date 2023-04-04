@@ -7,7 +7,8 @@ import { Link } from "react-router-dom";
 import {
   SetQuestionPaper,
   UpdateCurrentSection,
-  InitialSetAnswer,
+  SetQuestionPaperID,
+  SetPaperTypeID,
 } from "../redux/question/question.actions";
 
 const Card = (props) => {
@@ -26,8 +27,10 @@ const Card = (props) => {
       });
   }, []);
 
-  const getAllquestionsCurrentPaper = (id) => {
-    console.log("question paper id", id);
+  const getAllquestionsCurrentPaper = (id, pid) => {
+    props.SetQuestionPaperID(id);
+    props.SetPaperTypeID(pid);
+    console.log("question paper id type id", id, pid);
     axios
       .get(`http://localhost:8080/api/getPaper/${id}`)
       .then((res) => {
@@ -81,7 +84,9 @@ const Card = (props) => {
                 </div>
                 <Link
                   to="/instruction"
-                  onClick={() => getAllquestionsCurrentPaper(ppr.qp_id)}
+                  onClick={() =>
+                    getAllquestionsCurrentPaper(ppr.qp_id, ppr.ppr_id)
+                  }
                 >
                   <div className="btn btn-primary mt-3">Start Test</div>
                 </Link>
@@ -103,7 +108,8 @@ const mapDispatchToprops = (dispatch) => {
   return {
     SetQuestionPaper: (ppr) => dispatch(SetQuestionPaper(ppr)),
     UpdateCurrentSection: (sec) => dispatch(UpdateCurrentSection(sec)),
-    // InitialSetAnswer: () => dispatch(InitialSetAnswer()),
+    SetQuestionPaperID: (id) => dispatch(SetQuestionPaperID(id)),
+    SetPaperTypeID: (pid) => dispatch(SetPaperTypeID(pid)),
   };
 };
 

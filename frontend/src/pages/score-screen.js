@@ -1,4 +1,10 @@
+import { useEffect, useState } from "react";
 import { Doughnut } from "react-chartjs-2";
+
+// import { compose } from "redux";
+import { connect } from "react-redux";
+import axios from "axios";
+// import { useLocation, withRouter } from "react-router-dom";
 
 const data = {
   labels: ["Wrong", "Correct", "Unattempt"],
@@ -22,7 +28,61 @@ const data = {
   ],
 };
 
-const ScoreScreen = () => {
+const ScoreScreen = (props) => {
+  // const location = useLocation();
+
+  const [paperDetail, setPaperDetail] = useState({});
+
+  console.log(props);
+
+  useEffect(() => {
+    console.log(props);
+    console.log(props.PaperTypeID);
+    axios
+      .get(`http://localhost:8080/api/getQuesPaperDetail/${props.PaperTypeID}`)
+      .then((res) => {
+        // console.log(res.data);
+        setPaperDetail(res.data[0]);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, []);
+
+  // const getPaperDetail = () => {
+  //   axios
+  //     .get(`http://localhost:8080/api/getQuesPaperDetail/${props.PaperTypeID}`)
+  //     .then((res) => {
+  //       // console.log(res.data);
+  //       setPaperDetail(res.data);
+  //     })
+  //     .catch((err) => {
+  //       console.log(err);
+  //     });
+  // };
+
+  const accuracy = () => {
+    const ques = props.Questions;
+    let num_of_ans = 0;
+    Object.keys(props.Questions).map((key) =>
+      ques[key].forEach((question) => {
+        if (question.isAnswered) {
+          num_of_ans++;
+        }
+      })
+    );
+
+    const acc = (props.Score / num_of_ans) * 100;
+    // console.log(acc);
+    return acc;
+  };
+
+  const percentage = () => {
+    const percent = ((props.Score / paperDetail.total_marks) * 100).toFixed(2);
+    return percent;
+  };
+
+  console.log(paperDetail);
   return (
     <>
       <nav
@@ -64,7 +124,8 @@ const ScoreScreen = () => {
                     Score
                   </div>
                   <div className="h5 mb-0 font-weight-bold text-gray-800">
-                    <span>3.00</span>/<span className="ng-binding">480</span>
+                    <span>{props.Score}</span>/
+                    <span className="ng-binding">480</span>
                   </div>
                 </div>
                 <div className="col-auto">
@@ -88,7 +149,7 @@ const ScoreScreen = () => {
                   <div className="row no-gutters align-items-center">
                     <div className="col-auto">
                       <div className="h5 mb-0 mr-3 font-weight-bold text-gray-800">
-                        <span>50.00</span>%
+                        <span>{accuracy()}</span>%
                       </div>
                     </div>
                   </div>
@@ -135,7 +196,7 @@ const ScoreScreen = () => {
                     Percentage
                   </div>
                   <div className="h5 mb-0 font-weight-bold text-gray-800">
-                    <span>0.63</span>%
+                    <span>{percentage()}</span>%
                   </div>
                 </div>
                 <div className="col-auto">
@@ -277,7 +338,6 @@ const ScoreScreen = () => {
                   <th scope="col">Attempted</th>
                   <th scope="col">Correct</th>
                   <th scope="col">Accuracy</th>
-                  <th scope="col">Time</th>
                 </tr>
               </thead>
               <tbody>
@@ -309,10 +369,6 @@ const ScoreScreen = () => {
                       50.00%
                     </div>
                   </td>
-
-                  <td ng-bind="convertHMS(x[8])" class="ng-binding">
-                    00:37
-                  </td>
                 </tr>
                 <tr ng-repeat="x in report_data.scorecard" class="ng-scope">
                   <th scope="row" ng-bind="x[0]" class="ng-binding">
@@ -341,8 +397,6 @@ const ScoreScreen = () => {
                   <td>
                     <div>0.00%</div>
                   </td>
-
-                  <td>00:00</td>
                 </tr>
                 <tr>
                   {" "}
@@ -366,7 +420,6 @@ const ScoreScreen = () => {
                   <td>
                     <div>0.00%</div>
                   </td>
-                  <td>00:00</td>
                 </tr>
                 <tr>
                   {" "}
@@ -388,7 +441,6 @@ const ScoreScreen = () => {
                   <td>
                     <div>0.00%</div>
                   </td>
-                  <td> 00:00</td>
                 </tr>
               </tbody>
             </table>
@@ -399,4 +451,13 @@ const ScoreScreen = () => {
   );
 };
 
-export default ScoreScreen;
+const mapStateToProps = (state) => {
+  return {
+    PaperTypeID: state.index.paperTypeID,
+    Score: state.index.score,
+    PaperID: state.index.paperID,
+    Questions: state.index.questions,
+  };
+};
+
+export default connect(mapStateToProps)(ScoreScreen);

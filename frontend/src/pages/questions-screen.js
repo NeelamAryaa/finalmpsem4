@@ -9,12 +9,15 @@ import {
   Unchecked,
   MarkForReview,
   ChangeQuestion,
-  IsVisited,
 } from "../redux/question/question.actions";
 
 class QuestionsScreen extends Component {
   state = {
     checkedOption: -1,
+  };
+
+  componentDidMount = () => {
+    console.log(this.props.questions);
   };
 
   updateCheckedOption = (idx) => {
@@ -29,36 +32,46 @@ class QuestionsScreen extends Component {
   clearResponse = (qid) => {
     this.setState({ checkedOption: -1 });
     this.props.Unchecked(qid);
-    // this.props.SetAnswer(qid, -1);
   };
 
   render() {
     return (
       <Fragment>
-        {/*<nav
-          className="navbar 
+        {Object.keys(this.props.questions).length ? (
+          <div className="row  mx-0">
+            <QuesScreenLeftPanel
+              questions={this.props.questions}
+              answers={this.props.answers}
+              MarkForReview={this.props.MarkForReview}
+              clearResponse={this.clearResponse}
+              SetAnswer={this.props.SetAnswer}
+              updateCheckedOption={this.updateCheckedOption}
+              checkedOption={this.state.checkedOption}
+            />
+            <QuesScreenRightPanel
+              questions={this.props.questions}
+              currentSection={this.props.currentSection}
+              onChangeQues={this.onChangeQues}
+              updateCheckedOption={this.updateCheckedOption}
+            />
+          </div>
+        ) : (
+          <>
+            <nav
+              className="navbar 
          py-0 px-3 text-white"
-          style={{ backgroundColor: "#29385c" }}
-        >
-          NIMCET - 2021
-        </nav>*/}
-        <div className="row  mx-0">
-          <QuesScreenLeftPanel
-            questions={this.props.questions}
-            answers={this.props.answers}
-            MarkForReview={this.props.MarkForReview}
-            clearResponse={this.clearResponse}
-            SetAnswer={this.props.SetAnswer}
-            updateCheckedOption={this.updateCheckedOption}
-            checkedOption={this.state.checkedOption}
-          />
-          <QuesScreenRightPanel
-            questions={this.props.questions}
-            currentSection={this.props.currentSection}
-            onChangeQues={this.onChangeQues}
-            updateCheckedOption={this.updateCheckedOption}
-          />
-        </div>
+              style={{ backgroundColor: "#29385c" }}
+            >
+              NIMCET - 2021
+            </nav>
+            <div
+              className="d-flex justify-content-center align-items-center"
+              style={{ height: "90vh" }}
+            >
+              <h1>Question Paper not found</h1>
+            </div>
+          </>
+        )}
       </Fragment>
     );
   }

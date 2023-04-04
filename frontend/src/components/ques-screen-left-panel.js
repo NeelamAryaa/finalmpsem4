@@ -3,7 +3,6 @@ import { connect } from "react-redux";
 import {
   UpdateCurrentSection,
   UpdateCurrentIndex,
-  SetAnswer,
   IsAnswered,
   IsVisited,
 } from "../redux/question/question.actions";
@@ -20,12 +19,6 @@ class QuesScreenLeftPanel extends Component {
   onChangeOption = (idx) => {
     this.props.updateCheckedOption(idx);
   };
-
-  // clearResponse = (qid) => {
-  //   // this.props.updateCheckedOption(-1);
-
-  //   this.props.clearResponse(qid);
-  // };
 
   onClickSaveAndNext = (qid) => {
     if (this.props.checkedOption !== -1) {

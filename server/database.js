@@ -1,6 +1,8 @@
 const express = require("express");
-const cors = require("cors");
 const app = express();
+const cors = require("cors");
+const bodyParser = require("body-parser");
+const axios = require("axios");
 
 const { createConnection } = require("mysql2");
 
@@ -13,11 +15,25 @@ const con = createConnection({
 
 app.use(cors());
 
+// Configuring body parser middleware
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+
 // All Apis
+
+app.get(`/api/getQuesPaperDetail/:id`, (req, res) => {
+  con.query(
+    `select distinct p.ppr_id, p.paper_name, p.total_ques, p.total_marks, p.total_time from papers p inner join question_paper qp on  p.ppr_id=qp.p_id where p.ppr_id=${req.params.id}`,
+    (err, result) => {
+      if (err) console.log(err);
+      res.send(result);
+    }
+  );
+});
 
 app.get("/api/getAllPaper", (req, res) => {
   con.query(
-    `select q.qp_id, p.paper_name, q.year, p.total_ques, p.total_marks, p.total_time
+    `select p.ppr_id, q.qp_id, p.paper_name, q.year, p.total_ques, p.total_marks, p.total_time
     from cbt.question_paper q inner join papers p on q.p_id=p.ppr_id`,
     (err, result) => {
       if (err) console.log(err);
@@ -44,6 +60,7 @@ app.get(`/api/getPaper/:id`, (req, res) => {
     where qp.q_ppr_id=${req.params.id}  `,
     (err, result) => {
       if (err) console.log(err);
+      // console.log("aise aa rha ====", result);
 
       const rsult = groupBy(result, "section_name");
       // console.log(r);
@@ -51,6 +68,46 @@ app.get(`/api/getPaper/:id`, (req, res) => {
       res.send(rsult);
     }
   );
+});
+
+app.get("/api/getAnswerKey/:id", (req, res) => {
+  con.query(
+    `select ques.qid, ques.answer from ques_in_quespaper qp inner join questions ques on qp.ques_id=ques.qid where qp.q_ppr_id=${req.params.id}`,
+    (err, result) => {
+      if (err) console.log(err);
+      console.log(result);
+      res.send(result);
+    }
+  );
+});
+
+// get score api
+app.post(`/api/getScore`, (req, response) => {
+  const answer = req.body.ans;
+  console.log("user ans ====", answer);
+  const id = req.body.id;
+
+  axios
+    .get(`http://localhost:8080/api/getAnswerKey/${id}`)
+    .then((res) => {
+      console.log("anskey=====", res.data);
+      const answer_key = res.data;
+      let score = 0;
+      let correct = {};
+      answer_key.forEach((e) => {
+        // console.log(answer[e.qid]);
+        if (answer[e.qid] + 1 == e.answer) {
+          score += 1;
+          correct[e.qid] = true;
+        }
+      });
+      console.log("score======", score);
+      // response.send({ score: score });
+      // return score;
+      response.send({ score: score, correct: correct });
+    })
+
+    .catch((err) => console.log(err));
 });
 
 // ===============previous code===================

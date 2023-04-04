@@ -9,11 +9,27 @@ import {
   IS_VISITED,
   SET_PAPER,
   INITIAL_ANSWER,
+  SET_PAPER_ID,
+  SET_SCORE,
+  SET_PAPER_TYPE_ID,
+  // SET_IS_CORRECT,
 } from "./question.types";
+
+export const SetPaperTypeID = (pid) => {
+  return (dispatch) => {
+    dispatch({ type: SET_PAPER_TYPE_ID, payload: pid });
+  };
+};
+
+export const SetQuestionPaperID = (id) => {
+  return (dispatch) => {
+    dispatch({ type: SET_PAPER_ID, payload: id });
+  };
+};
 
 export const SetQuestionPaper = (ppr) => {
   return (dispatch, getState) => {
-    const { currentIndex, currentSection, answerArray } = getState().index;
+    const { currentIndex, currentSection } = getState().index;
 
     const ans = {};
     const keys = Object.keys(ppr);
@@ -24,6 +40,7 @@ export const SetQuestionPaper = (ppr) => {
         ques.isVisited = false;
         ques.isReviewed = false;
         ques.isAnswered = false;
+        ques.isCorrect = false;
         ans[ques.qid] = -1;
         console.log(ans);
       });
@@ -35,6 +52,27 @@ export const SetQuestionPaper = (ppr) => {
     dispatch({ type: INITIAL_ANSWER, payload: ans });
   };
 };
+
+// export const SetIsCorrect = (correct) => {
+//   return (dispatch, getState) => {
+//     const { questions } = getState().index;
+//     const ques = { ...questions };
+//     const keys = Object.keys(ques);
+
+//     keys.forEach((key) => {
+//       ques[key].forEach((q) => {
+//         console.log(q);
+//         // if(q.qid === )
+
+//         // q.isCorrect = true;
+//       });
+//     });
+
+//     // ques[currentSection][currentIndex].isVisited = true;
+
+//     dispatch({ type: SET_IS_CORRECT, payload: ques });
+//   };
+// };
 
 export const SetAnswer = (qid, idx) => {
   return (dispatch, getState) => {
@@ -108,5 +146,11 @@ export const IsAnswered = () => {
     const ques = { ...questions };
     ques[currentSection][currentIndex].isAnswered = true;
     dispatch({ type: IS_ANSWERED, payload: ques });
+  };
+};
+
+export const SetScore = (score) => {
+  return (dispatch) => {
+    dispatch({ type: SET_SCORE, payload: score });
   };
 };

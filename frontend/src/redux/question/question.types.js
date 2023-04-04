@@ -9,3 +9,7 @@ export const UPDATE_SECTION = "UPDATE_SECTION";
 export const IS_VISITED = "IS_VISITED";
 export const IS_ANSWERED = "IS_ANSWERED";
 export const INITIAL_ANSWER = "INITIAL_ANSWER";
+export const SET_PAPER_ID = "SET_PAPER_ID";
+export const SET_SCORE = "SET_SCORE";
+export const SET_PAPER_TYPE_ID = "SET_PAPER_TYPE_ID";
+// export const SET_IS_CORRECT = "SET_IS_CORRECT";

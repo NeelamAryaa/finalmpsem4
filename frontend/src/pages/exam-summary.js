@@ -2,21 +2,42 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import { SetScore, SetIsCorrect } from "../redux/question/question.actions";
+import ScoreScreen from "./score-screen";
 
 class ExamSummary extends Component {
   // goBack = () => {
   //   console.log(this.props.history);
   // };
 
+  Count = () => {
+    console.log("hi i m count");
+  };
+
   calulateScore = () => {
-    axios.post();
+    axios
+      .post(
+        `http://localhost:8080/api/getScore/`,
+        { id: this.props.QuesPprID, ans: this.props.answers },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      )
+      .then((response) => {
+        console.log("calfn======", response.data);
+        this.props.SetScore(response.data.score);
+        console.log("correct ======", response.data.correct);
+        // this.props.SetIsCorrect(response.data.correct);
+      })
+      .catch((err) => console.log("calfn=========", err));
   };
 
   getCount = (sec) => {
     const ques = this.props.Questions;
     let num_of_ans, num_of_visit, num_of_review;
     num_of_ans = num_of_visit = num_of_review = 0;
-
     ques[sec].forEach((question) => {
       if (question.isAnswered) {
         num_of_ans++;
@@ -83,14 +104,17 @@ class ExamSummary extends Component {
 
           <div className="fs-4">Are you sure to submit your test?</div>
           <div className="m-2">
-            <Link to="/score-screen">
+            <Link to={{ pathname: "/score-screen", state: { func: 1 } }}>
               <button
                 type="button"
                 className="btn btn-primary me-2"
-                onClick={this.calulateScore()}
+                onClick={() => {
+                  this.calulateScore();
+                }}
               >
                 Yes
               </button>
+              <></>
             </Link>
             <Link to="/questionscreen">
               <button
@@ -112,7 +136,15 @@ const mapStateToProps = (state) => {
   return {
     Questions: state.index.questions,
     answers: state.index.answers,
+    QuesPprID: state.index.paperID,
   };
 };
 
-export default connect(mapStateToProps)(ExamSummary);
+const mapDispatchToProps = (dispatch) => {
+  return {
+    SetScore: (score) => dispatch(SetScore(score)),
+    // SetIsCorrect: (correct) => dispatch(SetIsCorrect(correct)),
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(ExamSummary);
