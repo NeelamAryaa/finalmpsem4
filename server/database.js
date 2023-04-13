@@ -1,16 +1,21 @@
 const express = require("express");
 const app = express();
+const dotenv = require("dotenv");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const axios = require("axios");
 
+const { genSaltSync, hashSync } = require("bcrypt");
+
+dotenv.config({ path: "./.env" });
+
 const { createConnection } = require("mysql2");
 
 const con = createConnection({
-  host: "localhost",
-  user: "root",
-  password: "root",
-  database: "cbt",
+  host: process.env.DATABASE_HOST,
+  user: process.env.DATABASE_USER,
+  password: process.env.DATABASE_PASSWORD,
+  database: process.env.DATABASE,
 });
 
 app.use(cors());
@@ -18,6 +23,33 @@ app.use(cors());
 // Configuring body parser middleware
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+
+// app.use("/auth", require(""));
+
+// ================user_registration_login=====================
+
+app.post("/auth/register", (req, res) => {
+  const salt = genSaltSync(10);
+
+  let { username, email, password, confirm_password } = req.body.details;
+  password = hashSync(password, salt);
+
+  con.query(
+    `insert into user (username, email_id, password, user_type) values ( ?, ?, ?, 'user')`,
+    [username, email, password],
+    (err, result) => {
+      if (err) {
+        console.log(err);
+      }
+      res
+        .status(201)
+        .json({ msg: `user successfully register!!!`, data: result });
+    }
+  );
+  console.log(req.body.details);
+});
+
+// ================user_registration_login_ends================
 
 // All Apis
 
@@ -72,42 +104,115 @@ app.get(`/api/getPaper/:id`, (req, res) => {
 
 app.get("/api/getAnswerKey/:id", (req, res) => {
   con.query(
-    `select ques.qid, ques.answer from ques_in_quespaper qp inner join questions ques on qp.ques_id=ques.qid where qp.q_ppr_id=${req.params.id}`,
+    `select ques.qid, s.section_name, ques.answer from ques_in_quespaper qp 
+    inner join questions ques on qp.ques_id=ques.qid 
+    inner join section s on ques.sec_id=s.id
+    where qp.q_ppr_id=${req.params.id}`,
     (err, result) => {
       if (err) console.log(err);
       console.log(result);
-      res.send(result);
+      const rsult = groupBy(result, "section_name");
+      // console.log(r);
+
+      res.send(rsult);
+      // res.send(result);
     }
   );
 });
 
 // get score api
-app.post(`/api/getScore`, (req, response) => {
+
+let result = {
+  sec_wise_score: {},
+  sec_wise_attempt: {},
+  total_attempt: -1,
+  total_score: -1,
+  accuracy: 0,
+  percentage: 0,
+  total_ques: 0,
+};
+
+app.post(`/api/calculateScore`, (req, response) => {
   const answer = req.body.ans;
   console.log("user ans ====", answer);
   const id = req.body.id;
+
+  const total_no_of_ques = Object.keys(answer).length;
 
   axios
     .get(`http://localhost:8080/api/getAnswerKey/${id}`)
     .then((res) => {
       console.log("anskey=====", res.data);
       const answer_key = res.data;
-      let score = 0;
-      let correct = {};
-      answer_key.forEach((e) => {
-        // console.log(answer[e.qid]);
-        if (answer[e.qid] + 1 == e.answer) {
-          score += 1;
-          correct[e.qid] = true;
-        }
+
+      result.total_ques = total_no_of_ques;
+
+      let sec_wise_score = [];
+      let sec_wise_attempt = [];
+      let t_score = 0;
+      let t_attempt = 0;
+
+      const keys = Object.keys(answer_key);
+      keys.forEach((key, idx) => {
+        let score = 0;
+        let attempt = 0;
+
+        answer_key[key].forEach((e) => {
+          console.log(answer[e.qid]);
+          if (answer[e.qid] + 1 == e.answer) {
+            score += 1;
+          }
+          if (answer[e.qid] !== -1) {
+            attempt += 1;
+          }
+        });
+        // result[0].sec_wise_score=({ [key]: score });
+        // result[1].sec_wise_attempt.push({ [key]: attempt });
+        sec_wise_score.push({ [key]: score });
+        sec_wise_attempt.push({ [key]: attempt });
+        // result.push({ sec_wise_attempt: { [key]: attempt } });
+        console.log(
+          "sec_wise_attempt@@@@@@@@@@@@@",
+          sec_wise_score,
+          sec_wise_attempt
+        );
+
+        result.sec_wise_attempt = sec_wise_attempt;
+        result.sec_wise_score = sec_wise_score;
+
+        t_score += result.sec_wise_score[idx][key];
+        t_attempt += result.sec_wise_attempt[idx][key];
       });
-      console.log("score======", score);
-      // response.send({ score: score });
-      // return score;
-      response.send({ score: score, correct: correct });
+
+      result.total_score = t_score;
+      result.total_attempt = t_attempt;
+
+      const accuracy =
+        (result.total_score /
+          (result.total_attempt ? result.total_attempt : -1)) *
+        100;
+      result.accuracy = accuracy.toFixed(2);
+
+      const percent = (
+        (result.total_score / (total_no_of_ques ? total_no_of_ques : -1)) *
+        100
+      ).toFixed(2);
+      result.percentage = percent;
+
+      console.log("result======", result);
+
+      response.send(
+        // score: -100,
+        // correct: {},
+        result
+      );
     })
 
     .catch((err) => console.log(err));
+});
+
+app.get("/api/getScore", (req, res) => {
+  res.send(result);
 });
 
 // ===============previous code===================
@@ -199,3 +304,5 @@ app.listen(8080, "0.0.0.0", (err) => {
   if (err) console.log(err);
   console.log("app is running on 8080");
 });
+
+module.exports = con;

@@ -1,7 +1,9 @@
 import React, { Component, Fragment } from "react";
+import axios from "axios";
 
 import QuesScreenLeftPanel from "../components/ques-screen-left-panel";
 import QuesScreenRightPanel from "../components/ques-screen-right-panel";
+import TestSummaryModal from "../components/test-summary-modal";
 import "../App.css";
 import { connect } from "react-redux";
 import {
@@ -9,6 +11,8 @@ import {
   Unchecked,
   MarkForReview,
   ChangeQuestion,
+  SetQuestionPaper,
+  UpdateCurrentSection,
 } from "../redux/question/question.actions";
 
 class QuestionsScreen extends Component {
@@ -16,9 +20,61 @@ class QuestionsScreen extends Component {
     checkedOption: -1,
   };
 
-  componentDidMount = () => {
+  getAllquestionsCurrentPaper = async (id, pid) => {
+    console.log("question paper id type id", id, pid);
+    await axios
+      .get(`http://localhost:8080/api/getPaper/${this.props.match.params.id}`)
+      .then((res) => {
+        // console.log(res.data);
+        console.log(this.props);
+        this.props.UpdateCurrentSection(Object.keys(res.data)[0]);
+        this.props.SetQuestionPaper(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
+    console.log("im getallquesfunction");
     console.log(this.props.questions);
   };
+
+  handleBeforeUnload = (e) => {
+    e.preventDefault();
+    const message =
+      "Are you sure you want to leave? All provided data will be lost.";
+    e.returnValue = message;
+    return message;
+  };
+
+  componentDidMount = () => {
+    this.getAllquestionsCurrentPaper(
+      this.props.quesPprID,
+      this.props.paperTypeID
+    );
+
+    const { history } = this.props;
+
+    window.addEventListener("popstate", (e) => {
+      // alert("Your data will be lost!!!");
+      history.go(1);
+    });
+
+    window.addEventListener("beforeunload", this.handleBeforeUnload);
+    return () => {
+      window.removeEventListener("beforeunload", this.handleBeforeUnload);
+    };
+  };
+
+  // componentWillUpdate = () => {
+  //   const { history } = this.props;
+  //   window.addEventListener("popstate", (e) => {
+  //     // e.preventDefault();
+  //     if (window.confirm("you will lost your data") == true) {
+  //       // alert("you will lost your data");
+  //       history.go(1);
+  //     }
+  //   });
+  // };
 
   updateCheckedOption = (idx) => {
     this.setState({ checkedOption: idx });
@@ -37,6 +93,8 @@ class QuestionsScreen extends Component {
   render() {
     return (
       <Fragment>
+        {/* <TestSummaryModal /> */}
+
         {Object.keys(this.props.questions).length ? (
           <div className="row  mx-0">
             <QuesScreenLeftPanel
@@ -82,11 +140,15 @@ const mapStateToProps = (state) => {
     questions: state.index.questions,
     answers: state.index.answers,
     currentSection: state.index.currentSection,
+    quesPprID: state.index.paperID,
+    paperTypeID: state.index.paperTypeID,
   };
 };
 
 const mapDispatchToprops = (dispatch) => {
   return {
+    SetQuestionPaper: (ppr) => dispatch(SetQuestionPaper(ppr)),
+    UpdateCurrentSection: (sec) => dispatch(UpdateCurrentSection(sec)),
     Unchecked: (qid) => dispatch(Unchecked(qid)),
     MarkForReview: () => dispatch(MarkForReview()),
     ChangeQuestion: (idx) => dispatch(ChangeQuestion(idx)),

@@ -1,7 +1,56 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { connect } from "react-redux";
+
+import axios from "axios";
 
 const QuesScreenRightPanel = (props) => {
+  const calulateScore = async () => {
+    await axios
+      .post(
+        `http://localhost:8080/api/calculateScore/`,
+        { id: props.QuesPprID, ans: props.answers },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      )
+      .then((response) => {
+        console.log("r======", response.data);
+        // const result = response.data;
+        // setResult(response.data);
+        // const correct = result.total_score;
+        // const wrong = result.total_attempt - result.total_score;
+        // const unattempt = result.total_ques - result.total_attempt;
+
+        // const data = [wrong, correct, unattempt];
+        // console.log("pie data", data);
+        // setPieData(data);
+      })
+      .catch((err) => console.log("r=========", err));
+  };
+
+  // useEffect(() => {
+  //   console.log("mount===========");
+
+  //   calulateScore();
+
+  //   console.log(pieData);
+
+  //   console.log(props);
+  //   console.log(props.PaperTypeID);
+  //   axios
+  //     .get(`http://localhost:8080/api/getQuesPaperDetail/${props.PaperTypeID}`)
+  //     .then((res) => {
+  //       console.log(res.data[0]);
+  //       setPaperDetail(res.data[0]);
+  //     })
+  //     .catch((err) => {
+  //       console.log(err);
+  //     });
+  // }, []);
+
   return (
     <div className="col-3 p-0 border-start">
       <div className="row mx-0 text-primary">
@@ -118,7 +167,11 @@ const QuesScreenRightPanel = (props) => {
       </div>
       <div className="container-fluid text-center">
         <Link to="/examsummary">
-          <button type="button" className="btn btn-success my-3">
+          <button
+            type="button"
+            className="btn btn-success my-3"
+            onClick={calulateScore}
+          >
             Submit
           </button>
         </Link>
@@ -127,4 +180,14 @@ const QuesScreenRightPanel = (props) => {
   );
 };
 
-export default QuesScreenRightPanel;
+const mapStateToProps = (state) => {
+  return {
+    // PaperTypeID: state.index.paperTypeID,
+    // PaperID: state.index.paperID,
+    // Questions: state.index.questions,
+    answers: state.index.answers,
+    QuesPprID: state.index.paperID,
+  };
+};
+
+export default connect(mapStateToProps)(QuesScreenRightPanel);

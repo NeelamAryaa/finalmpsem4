@@ -5,8 +5,8 @@ import { connect } from "react-redux";
 import { Link } from "react-router-dom";
 
 import {
-  SetQuestionPaper,
-  UpdateCurrentSection,
+  // SetQuestionPaper,
+  // UpdateCurrentSection,
   SetQuestionPaperID,
   SetPaperTypeID,
 } from "../redux/question/question.actions";
@@ -27,27 +27,34 @@ const Card = (props) => {
       });
   }, []);
 
-  const getAllquestionsCurrentPaper = (id, pid) => {
+  const setIDs = (id, pid) => {
+    console.log(id, pid);
+
     props.SetQuestionPaperID(id);
     props.SetPaperTypeID(pid);
-    console.log("question paper id type id", id, pid);
-    axios
-      .get(`http://localhost:8080/api/getPaper/${id}`)
-      .then((res) => {
-        // console.log(res.data);
-        console.log(props);
-        props.UpdateCurrentSection(Object.keys(res.data)[0]);
-        props.SetQuestionPaper(res.data);
-        // props.InitialSetAnswer();
-        // console.log(res.data);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-
-    console.log("im getallquesfunction");
-    console.log(props.questions);
   };
+
+  // const getAllquestionsCurrentPaper = (id, pid) => {
+  //   props.SetQuestionPaperID(id);
+  //   props.SetPaperTypeID(pid);
+  //   console.log("question paper id type id", id, pid);
+  //   axios
+  //     .get(`http://localhost:8080/api/getPaper/${id}`)
+  //     .then((res) => {
+  //       // console.log(res.data);
+  //       console.log(props);
+  //       props.UpdateCurrentSection(Object.keys(res.data)[0]);
+  //       props.SetQuestionPaper(res.data);
+  //       // props.InitialSetAnswer();
+  //       // console.log(res.data);
+  //     })
+  //     .catch((err) => {
+  //       console.log(err);
+  //     });
+
+  //   console.log("im getallquesfunction");
+  //   console.log(props.questions);
+  // };
 
   // const getSection = (id) => {
   //   axios
@@ -84,8 +91,9 @@ const Card = (props) => {
                 </div>
                 <Link
                   to="/instruction"
-                  onClick={() =>
-                    getAllquestionsCurrentPaper(ppr.qp_id, ppr.ppr_id)
+                  onClick={
+                    () => setIDs(ppr.qp_id, ppr.ppr_id)
+                    // getAllquestionsCurrentPaper(ppr.qp_id, ppr.ppr_id)
                   }
                 >
                   <div className="btn btn-primary mt-3">Start Test</div>
@@ -106,8 +114,8 @@ const Card = (props) => {
 
 const mapDispatchToprops = (dispatch) => {
   return {
-    SetQuestionPaper: (ppr) => dispatch(SetQuestionPaper(ppr)),
-    UpdateCurrentSection: (sec) => dispatch(UpdateCurrentSection(sec)),
+    // SetQuestionPaper: (ppr) => dispatch(SetQuestionPaper(ppr)),
+    // UpdateCurrentSection: (sec) => dispatch(UpdateCurrentSection(sec)),
     SetQuestionPaperID: (id) => dispatch(SetQuestionPaperID(id)),
     SetPaperTypeID: (pid) => dispatch(SetPaperTypeID(pid)),
   };

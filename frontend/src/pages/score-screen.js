@@ -1,47 +1,73 @@
 import { useEffect, useState } from "react";
 import { Doughnut } from "react-chartjs-2";
 
-// import { compose } from "redux";
 import { connect } from "react-redux";
 import axios from "axios";
-// import { useLocation, withRouter } from "react-router-dom";
+// import { SetScore } from "../redux/question/question.actions";
 
-const data = {
-  labels: ["Wrong", "Correct", "Unattempt"],
-  datasets: [
-    {
-      label: "# of Votes",
-      data: [40, 40, 40],
-      backgroundColor: [
-        "rgba(247, 0, 0, 0.6)",
-        "rgba(26, 165, 46, 0.6)",
-        "rgba(247, 229, 0, 0.6)",
-      ],
-      borderColor: [
-        "rgba(247, 0, 0, 1)",
-        "rgba(26, 165, 46, 1)",
-        "rgba(247, 229, 0, 1)",
-      ],
-      borderWidth: 1.5,
-      cutout: 100,
-    },
-  ],
-};
+import NavBar from "../components/navbar";
 
 const ScoreScreen = (props) => {
-  // const location = useLocation();
-
   const [paperDetail, setPaperDetail] = useState({});
+  const [result, setResult] = useState({});
+  const [pieData, setPieData] = useState([]);
+
+  const data = {
+    labels: ["Wrong", "Correct", "Unattempt"],
+    datasets: [
+      {
+        label: "# of Votes",
+        // data: [10, 40, 40],
+        data: pieData,
+        backgroundColor: [
+          "rgba(247, 0, 0, 0.6)",
+          "rgba(26, 165, 46, 0.6)",
+          "rgba(247, 229, 0, 0.6)",
+        ],
+        borderColor: [
+          "rgba(247, 0, 0, 1)",
+          "rgba(26, 165, 46, 1)",
+          "rgba(247, 229, 0, 1)",
+        ],
+        borderWidth: 1.5,
+        cutout: 100,
+      },
+    ],
+  };
 
   console.log(props);
 
+  const getScore = async () => {
+    await axios
+      .get(`http://localhost:8080/api/getScore/`)
+      .then((response) => {
+        console.log("calfn======", response.data);
+        const result = response.data;
+        setResult(response.data);
+        const correct = result.total_score;
+        const wrong = result.total_attempt - result.total_score;
+        const unattempt = result.total_ques - result.total_attempt;
+
+        const data = [wrong, correct, unattempt];
+        console.log("pie data", data);
+        setPieData(data);
+      })
+      .catch((err) => console.log("calfn=========", err));
+  };
+
   useEffect(() => {
+    console.log("mount===========");
+
+    getScore();
+
+    console.log(pieData);
+
     console.log(props);
     console.log(props.PaperTypeID);
     axios
       .get(`http://localhost:8080/api/getQuesPaperDetail/${props.PaperTypeID}`)
       .then((res) => {
-        // console.log(res.data);
+        console.log(res.data[0]);
         setPaperDetail(res.data[0]);
       })
       .catch((err) => {
@@ -61,37 +87,20 @@ const ScoreScreen = (props) => {
   //     });
   // };
 
-  const accuracy = () => {
-    const ques = props.Questions;
-    let num_of_ans = 0;
-    Object.keys(props.Questions).map((key) =>
-      ques[key].forEach((question) => {
-        if (question.isAnswered) {
-          num_of_ans++;
-        }
-      })
-    );
-
-    const acc = (props.Score / num_of_ans) * 100;
-    // console.log(acc);
-    return acc;
-  };
-
-  const percentage = () => {
-    const percent = ((props.Score / paperDetail.total_marks) * 100).toFixed(2);
-    return percent;
-  };
-
-  console.log(paperDetail);
   return (
     <>
+      <NavBar />
       <nav
-        className="navbar navbar-dark flex-nowrap"
-        style={{ backgroundColor: "#29385c" }}
+        className="navbar navbar-dark flex-nowrap "
+        // style={{ text: "#29385c" }}
       >
         <div className="container-fluid">
-          <div className="d-flex">
-            <a className="navbar-brand" href="/">
+          <div className="d-flex ">
+            <a
+              className="navbar-brand"
+              href="/"
+              style={{ color: "black", fontWeight: 500, fontSize: "1.5rem" }}
+            >
               Your Score
             </a>
           </div>
@@ -124,8 +133,12 @@ const ScoreScreen = (props) => {
                     Score
                   </div>
                   <div className="h5 mb-0 font-weight-bold text-gray-800">
-                    <span>{props.Score}</span>/
-                    <span className="ng-binding">480</span>
+                    <span>{result.total_score}</span>
+                    <span> / </span>
+                    <span className="ng-binding">
+                      {/* {paperDetail.total_marks} */}
+                      {result.total_ques}
+                    </span>
                   </div>
                 </div>
                 <div className="col-auto">
@@ -149,7 +162,7 @@ const ScoreScreen = (props) => {
                   <div className="row no-gutters align-items-center">
                     <div className="col-auto">
                       <div className="h5 mb-0 mr-3 font-weight-bold text-gray-800">
-                        <span>{accuracy()}</span>%
+                        <span>{result.accuracy}</span>%
                       </div>
                     </div>
                   </div>
@@ -173,8 +186,9 @@ const ScoreScreen = (props) => {
                     Rank (AIR)
                   </div>
                   <div className="h5 mb-0 font-weight-bold text-gray-800">
-                    <span>841</span>
-                    <span>/980</span>
+                    <span>RANK</span>
+                    <span> / </span>
+                    <span>USERS</span>
                   </div>
                 </div>
                 <div className="col-auto">
@@ -196,7 +210,7 @@ const ScoreScreen = (props) => {
                     Percentage
                   </div>
                   <div className="h5 mb-0 font-weight-bold text-gray-800">
-                    <span>{percentage()}</span>%
+                    <span>{result.percentage}</span>%
                   </div>
                 </div>
                 <div className="col-auto">
@@ -224,7 +238,8 @@ const ScoreScreen = (props) => {
                         Attempted
                       </div>
                       <div class="h5 mb-0 font-weight-lightbold text-gray-700">
-                        <span>2</span> <span>of</span> <span>120</span>
+                        <span>{result.total_attempt}</span> <span>of</span>{" "}
+                        <span>{result.total_ques}</span>
                       </div>
                     </div>
                     <div class="col-auto">
@@ -253,7 +268,8 @@ const ScoreScreen = (props) => {
                       </div>
 
                       <div class="h5 mb-0 font-weight-lightbold text-gray-700">
-                        <span>1</span> <span>of</span> <span>120</span>
+                        <span>{result.total_score}</span> <span>of</span>{" "}
+                        <span>{result.total_attempt}</span>
                       </div>
                     </div>
                     <div class="col-auto">
@@ -280,7 +296,8 @@ const ScoreScreen = (props) => {
                         Incorrect
                       </div>
                       <div class="h5 mb-0 font-weight-lightbold text-gray-700">
-                        <span>1</span> <span>of</span> <span>120</span>
+                        <span>{result.total_attempt - result.total_score}</span>{" "}
+                        <span>of</span> <span>{result.total_attempt}</span>
                       </div>
                     </div>
                     <div class="col-auto">
@@ -307,7 +324,7 @@ const ScoreScreen = (props) => {
                         Time/Ques
                       </div>
                       <div class="h5 mb-0 font-weight-lightbold text-gray-700">
-                        <span>0 Min 18 Sec</span>
+                        <span>time = 0 Min 18 Sec</span>
                       </div>
                     </div>
                     <div class="col-auto">
@@ -341,107 +358,52 @@ const ScoreScreen = (props) => {
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <th scope="row">Mathematics</th>
+                {Object.keys(props.Questions).map((key, idx) => (
+                  <tr>
+                    <th scope="row" className="text-capitalize">
+                      {key}
+                    </th>
 
-                  <td>
-                    <div></div>
-                    <div>
-                      <span>2</span>
-                      <span> / </span>
-                      <span>50</span>
-                    </div>
-                  </td>
-
-                  <td>
-                    <div>
-                      <span>1</span>
-                      <span> / </span>
-                      <span>50</span>
-                    </div>
-                  </td>
-
-                  <td>
-                    <div
-                      ng-bind="nu_ex(((x[5]*100)/x[4])).toFixed(2)+'%'"
-                      class="ng-binding"
-                    >
-                      50.00%
-                    </div>
-                  </td>
-                </tr>
-                <tr ng-repeat="x in report_data.scorecard" class="ng-scope">
-                  <th scope="row" ng-bind="x[0]" class="ng-binding">
-                    Analytical Ability and Logical Reasoning
-                  </th>
-
-                  <td>
-                    <div>
-                      <span>0</span>
-                      <span> / </span>
-                      <span ng-bind="x[3]" class="ng-binding">
-                        40
-                      </span>
-                    </div>
-                  </td>
-
-                  <td>
-                    <div></div>
-                    <div>
-                      <span>0</span>
-                      <span> / </span>
-                      <span>40</span>
-                    </div>
-                  </td>
-
-                  <td>
-                    <div>0.00%</div>
-                  </td>
-                </tr>
-                <tr>
-                  {" "}
-                  <th scope="row">Computer Awareness</th>
-                  <td>
-                    <div>
-                      <span>0</span>
-                      <span> / </span>
-                      <span>10</span>
-                    </div>
-                  </td>
-                  <td>
-                    <div>
-                      <span ng-bind="x[5]" class="ng-binding">
-                        0
-                      </span>
-                      <span> / </span>
-                      <span>10</span>
-                    </div>
-                  </td>
-                  <td>
-                    <div>0.00%</div>
-                  </td>
-                </tr>
-                <tr>
-                  {" "}
-                  <th scope="row"> General English</th>
-                  <td>
-                    <div>
-                      <span>0</span>
-                      <span> / </span>
-                      <span>20</span>
-                    </div>
-                  </td>
-                  <td>
-                    <div>
-                      <span> 0</span>
-                      <span> / </span>
-                      <span> 20</span>
-                    </div>
-                  </td>
-                  <td>
-                    <div>0.00%</div>
-                  </td>
-                </tr>
+                    <td>
+                      <div>
+                        <span>
+                          {result.sec_wise_attempt
+                            ? result.sec_wise_attempt[idx][key]
+                            : -1}
+                        </span>
+                        <span> / </span>
+                        <span>{props.Questions[key].length}</span>
+                      </div>
+                    </td>
+                    <td>
+                      <div>
+                        <span>
+                          {result.sec_wise_score
+                            ? result.sec_wise_score[idx][key]
+                            : -1}
+                        </span>
+                        <span> / </span>
+                        <span>
+                          {result.sec_wise_attempt
+                            ? result.sec_wise_attempt[idx][key]
+                            : -1}
+                        </span>
+                      </div>
+                    </td>
+                    <td>
+                      {((result.sec_wise_score
+                        ? result.sec_wise_score[idx][key]
+                        : -1) /
+                        (result.sec_wise_attempt
+                          ? result.sec_wise_attempt[idx][key]
+                            ? result.sec_wise_attempt[idx][key]
+                            : 1
+                          : 1)) *
+                        100}
+                      %
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
@@ -454,10 +416,17 @@ const ScoreScreen = (props) => {
 const mapStateToProps = (state) => {
   return {
     PaperTypeID: state.index.paperTypeID,
-    Score: state.index.score,
     PaperID: state.index.paperID,
     Questions: state.index.questions,
+    answers: state.index.answers,
+    QuesPprID: state.index.paperID,
   };
 };
+
+// const mapDispatchToProps = (dispatch) => {
+//   return {
+//     // SetScore: (score) => dispatch(SetScore(score)),
+//   };
+// };
 
 export default connect(mapStateToProps)(ScoreScreen);

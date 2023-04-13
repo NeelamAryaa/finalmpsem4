@@ -4,16 +4,10 @@ import NavBar from "../components/navbar";
 // const screenfull = require("screenfull");
 
 const HomePage = () => {
-  // useEffect(() => {
-  //   if (screenfull.isEnabled) {
-  //     screenfull.request();
-  //   }
-  // });
-
   return (
     <Fragment>
       <NavBar />
-      <div className="bg-light py-4 px-5" style={{ minHeight: "90vh" }}>
+      <div className="bg-white py-4 px-5" style={{ minHeight: "90vh" }}>
         <Card />
       </div>
     </Fragment>

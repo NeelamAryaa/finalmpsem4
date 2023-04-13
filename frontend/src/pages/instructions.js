@@ -1,10 +1,28 @@
 import React, { Component, Fragment } from "react";
+import { connect } from "react-redux";
 import { withRouter } from "react-router-dom";
 
 class Instructions extends Component {
   state = {
     checked: false,
     checkBoxError: false,
+  };
+
+  handleBeforeUnload = (e) => {
+    e.preventDefault();
+    const message =
+      "Are you sure you want to leave? All provided data will be lost.";
+    e.returnValue = message;
+    return message;
+  };
+
+  componentDidMount = () => {
+    console.log("component did mount ques screen", this.props.questions);
+
+    window.addEventListener("beforeunload", this.handleBeforeUnload);
+    return () => {
+      window.removeEventListener("beforeunload", this.handleBeforeUnload);
+    };
   };
 
   onSubmitHandler = (e) => {
@@ -18,7 +36,7 @@ class Instructions extends Component {
     }
 
     if (checked === true) {
-      this.props.history.push("/questionscreen");
+      this.props.history.push(`/questionscreen/${this.props.quesPprID}`);
     }
 
     if (error) {
@@ -225,4 +243,10 @@ class Instructions extends Component {
   }
 }
 
-export default withRouter(Instructions);
+const mapStateToProps = (state) => {
+  return {
+    quesPprID: state.index.paperID,
+  };
+};
+
+export default connect(mapStateToProps)(Instructions);

@@ -1,39 +1,8 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import { Link } from "react-router-dom";
-import axios from "axios";
-import { SetScore, SetIsCorrect } from "../redux/question/question.actions";
-import ScoreScreen from "./score-screen";
 
 class ExamSummary extends Component {
-  // goBack = () => {
-  //   console.log(this.props.history);
-  // };
-
-  Count = () => {
-    console.log("hi i m count");
-  };
-
-  calulateScore = () => {
-    axios
-      .post(
-        `http://localhost:8080/api/getScore/`,
-        { id: this.props.QuesPprID, ans: this.props.answers },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      )
-      .then((response) => {
-        console.log("calfn======", response.data);
-        this.props.SetScore(response.data.score);
-        console.log("correct ======", response.data.correct);
-        // this.props.SetIsCorrect(response.data.correct);
-      })
-      .catch((err) => console.log("calfn=========", err));
-  };
-
   getCount = (sec) => {
     const ques = this.props.Questions;
     let num_of_ans, num_of_visit, num_of_review;
@@ -84,7 +53,8 @@ class ExamSummary extends Component {
               {Object.keys(this.props.Questions).map((key) => (
                 <tr>
                   <th scope="row" className="text-capitalize">
-                    {key} {() => this.getCount(key)}
+                    {key}
+                    {/* {() => this.getCount(key)} */}
                   </th>
                   <td>{this.props.Questions[key].length}</td>
                   <td>{this.getCount(key).num_of_ans}</td>
@@ -102,27 +72,17 @@ class ExamSummary extends Component {
             </tbody>
           </table>
 
-          <div className="fs-4">Are you sure to submit your test?</div>
+          <div className="fs-4">
+            Your test is submitted successfully! Proceed further.
+          </div>
           <div className="m-2">
-            <Link to={{ pathname: "/score-screen", state: { func: 1 } }}>
-              <button
-                type="button"
-                className="btn btn-primary me-2"
-                onClick={() => {
-                  this.calulateScore();
-                }}
-              >
-                Yes
-              </button>
-              <></>
-            </Link>
-            <Link to="/questionscreen">
-              <button
-                type="button"
-                className="btn btn-secondary "
-                // onClick={this.goBack}
-              >
-                No
+            <Link
+              to={{
+                pathname: "/score-screen",
+              }}
+            >
+              <button type="button" className="btn btn-primary me-2">
+                Proceed
               </button>
             </Link>
           </div>
@@ -135,16 +95,9 @@ class ExamSummary extends Component {
 const mapStateToProps = (state) => {
   return {
     Questions: state.index.questions,
-    answers: state.index.answers,
-    QuesPprID: state.index.paperID,
+    // answers: state.index.answers,
+    // QuesPprID: state.index.paperID,
   };
 };
 
-const mapDispatchToProps = (dispatch) => {
-  return {
-    SetScore: (score) => dispatch(SetScore(score)),
-    // SetIsCorrect: (correct) => dispatch(SetIsCorrect(correct)),
-  };
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(ExamSummary);
+export default connect(mapStateToProps)(ExamSummary);
