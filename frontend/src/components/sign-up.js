@@ -3,7 +3,10 @@ import { useState } from "react";
 import "../App.css";
 import axios from "axios";
 
-const SignUpPage = () => {
+const SignUpPage = (props) => {
+  const [sqlerr, setSqlerr] = useState("");
+  const [success, setSuccess] = useState("");
+  const [validation, setValidation] = useState({ errMsg: "" });
   const [details, setDetails] = useState({
     username: null,
     email: null,
@@ -11,63 +14,47 @@ const SignUpPage = () => {
     confirm_password: null,
   });
 
-  const onChangeHanadle = (e) => {
+  const onChangeHandle = (e) => {
     const name = e.target.name;
     const value = e.target.value;
     console.log(name, value);
 
-    setDetails({ ...details, [name]: value }, () => {
-      if (details.confirm_password != details.password) {
-        setValidation({ errMsg: "Password does not match!!!" });
-      }
-    });
+    setDetails({ ...details, [name]: value });
 
-    if (details.confirm_password != details.password) {
-      setValidation({ errMsg: "Password does not match!!!" });
-    }
-    // console.log("detail===========", details);
-    // setValidation({ errMsg: "" });
+    setValidation({ errMsg: "" });
+    setSqlerr("");
   };
-
-  // const validateField =  () => {
-  //   if (details.confirm_password != details.password) {
-  //      setValidation({ errMsg: "Password does not match!!!" });
-  //   }
-  // };
 
   const onSubmitHandler = (e) => {
     e.preventDefault();
-    // if (details.confirm_password != details.password) {
-    //   setValidation({ errMsg: "Password does not match!!!" });
-    // }
+    if (details.confirm_password != details.password) {
+      setValidation({ errMsg: "Password does not match!!!" });
+      return;
+    }
 
-    // validateField();
-    console.log("Details============", details);
-    if (validation.errMsg == "") {
-      axios
-        .post(
-          "http://localhost:8080/auth/register",
-          { details },
-          {
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        )
-        .then((response) => {
-          console.log(response.data);
-        })
-        .catch((err) => {
-          console.log(err);
+    // console.log("Details============", details);
+
+    axios
+      .post("http://localhost:8080/auth/register", { details })
+      .then((response) => {
+        console.log(response.data);
+        setSuccess(response.data.msg);
+
+        setDetails({
+          username: "",
+          email: "",
+          password: "",
+          confirm_password: "",
         });
 
-      setDetails({
-        username: "",
-        email: "",
-        password: "",
-        confirm_password: "",
+        // go to login page
+      })
+      .catch((err) => {
+        console.log(err.response.data);
+        setSqlerr(err.response.data.err);
+        // return;
+        // console.log(err);
       });
-    }
   };
 
   return (
@@ -94,6 +81,42 @@ const SignUpPage = () => {
                   </div>
                 ) : null}
 
+                {sqlerr ? (
+                  <div class="alert alert-danger" role="alert">
+                    {sqlerr}
+                  </div>
+                ) : null}
+
+                {success ? (
+                  // (
+                  // <div
+                  //   class="toast"
+                  //   role="alert"
+                  //   aria-live="assertive"
+                  //   aria-atomic="true"
+                  // >
+                  //   <div class="toast-header">
+                  //     <img src="..." class="rounded me-2" alt="..." />
+                  //     <strong class="me-auto">Bootstrap</strong>
+                  //     <small>11 mins ago</small>
+                  //     <button
+                  //       type="button"
+                  //       class="btn-close"
+                  //       data-bs-dismiss="toast"
+                  //       aria-label="Close"
+                  //     ></button>
+                  //   </div>
+                  //   <div class="toast-body">
+                  //     Hello, world! This is a toast message.
+                  //   </div>
+                  // </div>
+                  // ) :
+
+                  <div class="alert alert-success" role="alert">
+                    {success}
+                  </div>
+                ) : null}
+
                 <div class="form-outline mb-3">
                   <input
                     type="text"
@@ -101,7 +124,7 @@ const SignUpPage = () => {
                     name="username"
                     class="form-control form-control"
                     placeholder="Username"
-                    onChange={onChangeHanadle}
+                    onChange={onChangeHandle}
                     value={details.username}
                     required
                   />
@@ -115,7 +138,7 @@ const SignUpPage = () => {
                     name="email"
                     class="form-control form-control"
                     placeholder="Email address"
-                    onChange={onChangeHanadle}
+                    onChange={onChangeHandle}
                     value={details.email}
                     required
                   />
@@ -130,7 +153,7 @@ const SignUpPage = () => {
                     class="form-control form-control"
                     placeholder="Password"
                     value={details.password}
-                    onChange={onChangeHanadle}
+                    onChange={onChangeHandle}
                     required
                   />
                 </div>
@@ -143,7 +166,7 @@ const SignUpPage = () => {
                     class="form-control form-control"
                     placeholder="Confirm password"
                     value={details.confirm_password}
-                    onChange={onChangeHanadle}
+                    onChange={onChangeHandle}
                     required
                   />
                 </div>

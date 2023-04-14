@@ -31,7 +31,7 @@ app.use(bodyParser.json());
 app.post("/auth/register", (req, res) => {
   const salt = genSaltSync(10);
 
-  let { username, email, password, confirm_password } = req.body.details;
+  let { username, email, password } = req.body.details;
   password = hashSync(password, salt);
 
   con.query(
@@ -39,14 +39,16 @@ app.post("/auth/register", (req, res) => {
     [username, email, password],
     (err, result) => {
       if (err) {
-        console.log(err);
+        return res.status(400).json({ err: "Invalid data" });
+
+        // console.log(err);
       }
-      res
+      return res
         .status(201)
         .json({ msg: `user successfully register!!!`, data: result });
     }
   );
-  console.log(req.body.details);
+  // console.log(req.body.details);
 });
 
 // ================user_registration_login_ends================
@@ -57,8 +59,8 @@ app.get(`/api/getQuesPaperDetail/:id`, (req, res) => {
   con.query(
     `select distinct p.ppr_id, p.paper_name, p.total_ques, p.total_marks, p.total_time from papers p inner join question_paper qp on  p.ppr_id=qp.p_id where p.ppr_id=${req.params.id}`,
     (err, result) => {
-      if (err) console.log(err);
-      res.send(result);
+      if (err) res.send(err);
+      return res.send(result);
     }
   );
 });
@@ -68,8 +70,8 @@ app.get("/api/getAllPaper", (req, res) => {
     `select p.ppr_id, q.qp_id, p.paper_name, q.year, p.total_ques, p.total_marks, p.total_time
     from cbt.question_paper q inner join papers p on q.p_id=p.ppr_id`,
     (err, result) => {
-      if (err) console.log(err);
-      res.send(result);
+      if (err) return res.send(err);
+      return res.send(result);
     }
   );
 });
@@ -91,13 +93,13 @@ app.get(`/api/getPaper/:id`, (req, res) => {
     inner join section s on ques.sec_id=s.id
     where qp.q_ppr_id=${req.params.id}  `,
     (err, result) => {
-      if (err) console.log(err);
+      if (err) return res.send(err);
       // console.log("aise aa rha ====", result);
 
       const rsult = groupBy(result, "section_name");
       // console.log(r);
 
-      res.send(rsult);
+      return res.send(rsult);
     }
   );
 });
@@ -109,12 +111,12 @@ app.get("/api/getAnswerKey/:id", (req, res) => {
     inner join section s on ques.sec_id=s.id
     where qp.q_ppr_id=${req.params.id}`,
     (err, result) => {
-      if (err) console.log(err);
+      if (err) return res.send(err);
       console.log(result);
       const rsult = groupBy(result, "section_name");
       // console.log(r);
 
-      res.send(rsult);
+      return res.send(rsult);
       // res.send(result);
     }
   );
@@ -201,14 +203,10 @@ app.post(`/api/calculateScore`, (req, response) => {
 
       console.log("result======", result);
 
-      response.send(
-        // score: -100,
-        // correct: {},
-        result
-      );
+      response.send(result);
     })
 
-    .catch((err) => console.log(err));
+    .catch((err) => res.send(err));
 });
 
 app.get("/api/getScore", (req, res) => {
