@@ -25,7 +25,7 @@ const Profile = () => {
       <div className="container text-center fs-3 m-auto my-4 w-100">
         Test History
       </div>
-      <table class="table m-auto w-75">
+      <table class="table m-auto w-75 text-center">
         <thead>
           <tr>
             {/* <th scope="col">#</th> */}

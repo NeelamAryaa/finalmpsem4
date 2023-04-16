@@ -39,7 +39,7 @@ const NavBar = () => {
             </div>
           </div>
         ) : (
-          <div className="d-flex w-25 justify-content-between">
+          <div className="d-flex">
             <div
               role="button"
               className="text-white text-capitalize"
@@ -48,7 +48,7 @@ const NavBar = () => {
               JSON.parse(localStorage.getItem("login")).username
             } !`}</div>
             <div
-              className="text-white"
+              className="text-white mx-3"
               style={{ cursor: "pointer" }}
               onClick={onLogout}
             >

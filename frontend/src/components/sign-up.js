@@ -2,8 +2,10 @@ import { useState } from "react";
 import NavBar from "./navbar";
 import "../App.css";
 import axios from "axios";
+import { useHistory } from "react-router-dom";
 
 const SignUpPage = (props) => {
+  const history = useHistory();
   const [sqlerr, setSqlerr] = useState("");
   const [success, setSuccess] = useState("");
   const [validation, setValidation] = useState({ errMsg: "" });
@@ -48,7 +50,7 @@ const SignUpPage = (props) => {
         });
 
         // go to login page
-        props.history.push("/auth/login");
+        history.push("/auth/login");
       })
       .catch((err) => {
         console.log(err);
