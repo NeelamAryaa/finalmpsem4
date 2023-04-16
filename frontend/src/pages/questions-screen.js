@@ -23,9 +23,14 @@ class QuestionsScreen extends Component {
   getAllquestionsCurrentPaper = async (id, pid) => {
     console.log("question paper id type id", id, pid);
     await axios
-      .get(`http://localhost:8080/api/getPaper/${this.props.match.params.id}`)
+      .get(`http://localhost:8080/api/getPaper/${this.props.match.params.id}`, {
+        headers: {
+          Authorization:
+            "Bearer " + JSON.parse(localStorage.getItem("login")).token,
+        },
+      })
       .then((res) => {
-        // console.log(res.data);
+        console.log(res.data);
         console.log(this.props);
         this.props.UpdateCurrentSection(Object.keys(res.data)[0]);
         this.props.SetQuestionPaper(res.data);

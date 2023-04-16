@@ -11,6 +11,7 @@ import ScoreScreen from "./pages/score-screen";
 import LoginPage from "./components/login";
 import NavBar from "./components/navbar";
 import SignUpPage from "./components/sign-up";
+import Profile from "./components/profile";
 import PageNotFound from "./pages/404Page";
 // import TestSummaryModal from "./components/test-summary-modal";
 
@@ -20,17 +21,17 @@ function App() {
       <div className="App">
         {/* <TestSummaryModal /> */}
         {/* <NavBar /> */}
-        <SignUpPage />
-        <LoginPage />
+        {/* <SignUpPage /> */}
+        {/* <LoginPage /> */}
         <Switch>
           <Route path="/" component={HomePage} exact />
-
-          <Route path="/instruction" component={Instructions} />
-
-          <Route path="/questionscreen/:id" component={QuestionsScreen} />
-
-          <Route path="/examsummary" component={ExamSummary} />
-          <Route path="/score-screen" component={ScoreScreen} />
+          <Route path="/auth/register" component={SignUpPage} exact />
+          <Route path="/auth/login" component={LoginPage} exact />
+          <Route path="/instruction" component={Instructions} exact />
+          <Route path="/questionscreen/:id" component={QuestionsScreen} exact />
+          <Route path="/examsummary" component={ExamSummary} exact />
+          <Route path="/score-screen" component={ScoreScreen} exact />
+          <Route path="/profile" component={Profile} exact />
           <Route path="*" component={PageNotFound} />
         </Switch>
       </div>

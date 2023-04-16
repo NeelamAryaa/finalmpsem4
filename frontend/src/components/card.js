@@ -2,7 +2,7 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { connect } from "react-redux";
 
-import { Link } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 
 import {
   // SetQuestionPaper,
@@ -12,6 +12,8 @@ import {
 } from "../redux/question/question.actions";
 
 const Card = (props) => {
+  const history = useHistory();
+
   const [allQuestionPapers, setAllQuestionPaper] = useState([]);
   // const [currentSection, setCurrentSection] = useState(null);
 
@@ -27,11 +29,18 @@ const Card = (props) => {
       });
   }, []);
 
-  const setIDs = (id, pid) => {
+  const OnStartTest = (id, pid) => {
     console.log(id, pid);
 
     props.SetQuestionPaperID(id);
     props.SetPaperTypeID(pid);
+    if (localStorage.getItem("login")) {
+      history.push("/instruction");
+      console.log("props ", props);
+    } else {
+      console.log("history", history);
+      history.push("/auth/login");
+    }
   };
 
   // const getAllquestionsCurrentPaper = (id, pid) => {
@@ -89,15 +98,22 @@ const Card = (props) => {
                   <div>Marks : {ppr.total_marks}</div>
                   <div>Time : {ppr.total_time} mintues</div>
                 </div>
-                <Link
+                {/* <Link
                   to="/instruction"
                   onClick={
-                    () => setIDs(ppr.qp_id, ppr.ppr_id)
+                    () => OnStartTest(ppr.qp_id, ppr.ppr_id)
                     // getAllquestionsCurrentPaper(ppr.qp_id, ppr.ppr_id)
                   }
                 >
                   <div className="btn btn-primary mt-3">Start Test</div>
-                </Link>
+                </Link> */}
+
+                <div
+                  className="btn btn-primary mt-3"
+                  onClick={() => OnStartTest(ppr.qp_id, ppr.ppr_id)}
+                >
+                  Start Test
+                </div>
               </div>
             </div>
           ))

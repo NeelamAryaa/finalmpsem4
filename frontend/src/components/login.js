@@ -1,9 +1,47 @@
+import { useState } from "react";
+import axios from "axios";
 import "../App.css";
+import { useHistory } from "react-router-dom";
+import NavBar from "./navbar";
 
 const LoginPage = () => {
+  const history = useHistory();
+
+  const [details, setDetails] = useState({ email: null, password: null });
+
+  const onSubmitHandler = () => {
+    axios
+      .post(`http://localhost:8080/auth/login`, { details })
+      .then((response) => {
+        console.log(response.data);
+        localStorage.setItem(
+          "login",
+          JSON.stringify({
+            token: response.data.token,
+            user_id: response.data.user_id,
+            username: response.data.username,
+            msg: response.data.msg,
+          })
+        );
+        history.push("/");
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  const onChangeHandle = (e) => {
+    const name = e.target.name;
+    const value = e.target.value;
+    console.log(name, value);
+
+    setDetails({ ...details, [name]: value });
+  };
+
   return (
     <>
-      <section class="vh-100">
+      <NavBar />
+      <section class="vh-90 my-5">
         <div class="container-fluid h-custom">
           <div class="row d-flex justify-content-center align-items-center h-100">
             <div class="col-md-9 col-lg-6 col-xl-5">
@@ -33,9 +71,12 @@ const LoginPage = () => {
                 <div class="form-outline mb-3">
                   <input
                     type="email"
-                    id="form3Example3"
+                    // id="form3Example3"
+                    name="email"
                     class="form-control form-control"
                     placeholder="Enter email address"
+                    value={details.email}
+                    onChange={onChangeHandle}
                   />
                 </div>
 
@@ -43,9 +84,12 @@ const LoginPage = () => {
                 <div class="form-outline mb-3">
                   <input
                     type="password"
-                    id="form3Example4"
+                    // id="form3Example4"
+                    name="password"
                     class="form-control form-control"
                     placeholder="Enter password"
+                    value={details.password}
+                    onChange={onChangeHandle}
                   />
                   {/* <label class="form-label" for="form3Example4">
                     Password
@@ -71,14 +115,22 @@ const LoginPage = () => {
                 </div>
 
                 <div class="text-center text-lg-start mt-4 pt-2">
-                  <button type="button" class="btn btn-primary btn">
+                  <button
+                    type="button"
+                    class="btn btn-primary btn"
+                    onClick={onSubmitHandler}
+                  >
                     Login
                   </button>
                   <p class="small fw-bold mt-2 pt-1 mb-0">
                     Don't have an account?{" "}
-                    <a href="#!" class="link-danger">
+                    <div
+                      style={{ cursor: "pointer" }}
+                      class="d-inline link-danger"
+                      onClick={() => history.push("/auth/register")}
+                    >
                       Sign up
-                    </a>
+                    </div>
                   </p>
                 </div>
               </form>

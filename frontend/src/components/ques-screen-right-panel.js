@@ -1,15 +1,21 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { connect } from "react-redux";
 
 import axios from "axios";
 
 const QuesScreenRightPanel = (props) => {
+  // const [score, setScore] = useState(0);
+
   const calulateScore = async () => {
     await axios
       .post(
         `http://localhost:8080/api/calculateScore/`,
-        { id: props.QuesPprID, ans: props.answers },
+        {
+          id: props.QuesPprID,
+          ans: props.answers,
+          user_id: JSON.parse(localStorage.getItem("login")).user_id,
+        },
         {
           headers: {
             "Content-Type": "application/json",
@@ -18,38 +24,22 @@ const QuesScreenRightPanel = (props) => {
       )
       .then((response) => {
         console.log("r======", response.data);
-        // const result = response.data;
-        // setResult(response.data);
-        // const correct = result.total_score;
-        // const wrong = result.total_attempt - result.total_score;
-        // const unattempt = result.total_ques - result.total_attempt;
-
-        // const data = [wrong, correct, unattempt];
-        // console.log("pie data", data);
-        // setPieData(data);
+        // setScore(response.data.total_score);
       })
       .catch((err) => console.log("r=========", err));
+
+    // await axios
+    //   .post(
+    //     `http://localhost:8080/api/storeMarks/${
+    //       JSON.parse(localStorage.getItem("login")).user_id
+    //     }`,
+    //     { qp_id: props.QuesPprID, score: score }
+    //   )
+    //   .then((response) => {
+    //     console.log(response);
+    //   })
+    //   .catch((err) => console.log(err));
   };
-
-  // useEffect(() => {
-  //   console.log("mount===========");
-
-  //   calulateScore();
-
-  //   console.log(pieData);
-
-  //   console.log(props);
-  //   console.log(props.PaperTypeID);
-  //   axios
-  //     .get(`http://localhost:8080/api/getQuesPaperDetail/${props.PaperTypeID}`)
-  //     .then((res) => {
-  //       console.log(res.data[0]);
-  //       setPaperDetail(res.data[0]);
-  //     })
-  //     .catch((err) => {
-  //       console.log(err);
-  //     });
-  // }, []);
 
   return (
     <div className="col-3 p-0 border-start">
@@ -71,8 +61,10 @@ const QuesScreenRightPanel = (props) => {
         />
 
         <div className="col border-start">
-          <div className="row px-2">Name : Neelam</div>
-          <div className="row px-2">Roll no.: 20218833</div>
+          <div className="row px-2 text-capitalize">
+            Name : {JSON.parse(localStorage.getItem("login")).username}
+          </div>
+          {/* <div className="row px-2">Roll no.: 20218833</div> */}
         </div>
       </div>
       <hr className="m-0" />
@@ -139,10 +131,11 @@ const QuesScreenRightPanel = (props) => {
         style={{ height: "255px", background: "#63e7f23d" }}
       >
         <div className="row">
-          {props.questions[props.currentSection].map((ques, idx) => (
-            <div
-              role="button"
-              className={`col-2 border bg-secondary  text-white px-0 py-1 m-1 d-flex justify-content-center align-items-center 
+          {props.questions
+            ? props.questions[props.currentSection].map((ques, idx) => (
+                <div
+                  role="button"
+                  className={`col-2 border bg-secondary  text-white px-0 py-1 m-1 d-flex justify-content-center align-items-center 
                     ${
                       props.questions[props.currentSection][idx].isAnswered &&
                       props.questions[props.currentSection][idx].isReviewed
@@ -157,12 +150,13 @@ const QuesScreenRightPanel = (props) => {
                     }
 
                       `}
-              key={idx}
-              onClick={() => props.onChangeQues(idx)}
-            >
-              {idx + 1}
-            </div>
-          ))}
+                  key={idx}
+                  onClick={() => props.onChangeQues(idx)}
+                >
+                  {idx + 1}
+                </div>
+              ))
+            : null}
         </div>
       </div>
       <div className="container-fluid text-center">

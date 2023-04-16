@@ -1,5 +1,5 @@
 import { useState } from "react";
-
+import NavBar from "./navbar";
 import "../App.css";
 import axios from "axios";
 
@@ -48,10 +48,11 @@ const SignUpPage = (props) => {
         });
 
         // go to login page
+        props.history.push("/auth/login");
       })
       .catch((err) => {
-        console.log(err.response.data);
-        setSqlerr(err.response.data.err);
+        console.log(err);
+        // setSqlerr(err.response.data.err);
         // return;
         // console.log(err);
       });
@@ -59,7 +60,8 @@ const SignUpPage = (props) => {
 
   return (
     <>
-      <section class="vh-100">
+      <NavBar />
+      <section class="vh-90 my-3">
         <div class="container-fluid h-custom">
           <div class="row d-flex justify-content-center align-items-center h-100">
             <div class="col-md-9 col-lg-6 col-xl-5">

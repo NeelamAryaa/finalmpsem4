@@ -105,12 +105,12 @@ const ScoreScreen = (props) => {
             </a>
           </div>
         </div>
-        <div className="container-fluid justify-content-end">
+        {/* <div className="container-fluid justify-content-end">
           <button type="button" class="btn btn-info text-white ">
             <i className="fa fa-file pe-2"></i>
             Answer Key
           </button>
-        </div>
+        </div> */}
       </nav>
       <div className="d-flex flex-column w-50 text-center border mt-4 mx-auto shadow ">
         <h2 className="border-bottom py-2">Overview</h2>

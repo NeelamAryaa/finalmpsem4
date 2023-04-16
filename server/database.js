@@ -5,7 +5,8 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 const axios = require("axios");
 
-const { genSaltSync, hashSync } = require("bcrypt");
+const { genSaltSync, hashSync, compareSync } = require("bcrypt");
+const { sign, verify, decode } = require("jsonwebtoken");
 
 dotenv.config({ path: "./.env" });
 
@@ -26,6 +27,28 @@ app.use(bodyParser.json());
 
 // app.use("/auth", require(""));
 
+// middleware function
+
+checkToken = (req, res, next) => {
+  console.log("req body token", req.get("authorization"));
+  let token = req.get("authorization");
+  console.log("token", token);
+  if (token) {
+    token = token.slice(7);
+    verify(token, "keyhye", (err, decode) => {
+      if (err) {
+        return res.json({
+          msg: "Invalid token",
+        });
+      } else {
+        next();
+      }
+    });
+  } else {
+    return res.json({ msg: "Access denied!!! Unautherized user!!!" });
+  }
+};
+
 // ================user_registration_login=====================
 
 app.post("/auth/register", (req, res) => {
@@ -33,6 +56,7 @@ app.post("/auth/register", (req, res) => {
 
   let { username, email, password } = req.body.details;
   password = hashSync(password, salt);
+  console.log(req.body);
 
   con.query(
     `insert into user (username, email_id, password, user_type) values ( ?, ?, ?, 'user')`,
@@ -51,7 +75,86 @@ app.post("/auth/register", (req, res) => {
   // console.log(req.body.details);
 });
 
+app.post(`/auth/login`, (req, res) => {
+  console.log(req.body);
+  con.query(
+    `select * from user where email_id = ?`,
+    [req.body.details.email],
+    (err, result) => {
+      console.log("result", result);
+      if (err) {
+        return res.json({ err });
+      }
+      if (!result) {
+        return res.status(403).json({ err: "Invalid Credential!!!" });
+      }
+
+      const checkpwd = compareSync(
+        req.body.details.password,
+        result[0].password
+      );
+      if (checkpwd) {
+        result.password = undefined; //not want to send with res thats why!
+        const jsontoken = sign({ checkpwd: result }, "keyhye", {
+          expiresIn: "5h",
+        });
+
+        return res.json({
+          msg: "Login Successfully!!!",
+          username: result[0].username,
+          user_id: result[0].iduser,
+          token: jsontoken,
+        });
+      } else {
+        return res.json({ msg: "Invalid email or password!!!" });
+      }
+    }
+  );
+});
+
 // ================user_registration_login_ends================
+
+//====================Set User Score in DB====================
+// app.post("/api/storeMarks/:user_id", (req, res) => {
+//   const user_id = req.params.user_id;
+//   const { qp_id, score } = req.body;
+//   con.query(
+//     `insert into marks (user_id, paper_id, score, attempt_no) values (?, ?, ?, ?)`,
+//     [user_id, qp_id, score, new Date()],
+//     (err, result) => {
+//       if (err) {
+//         console.log(err);
+//         return res.status(400).json({ err: "Invalid data" });
+//       } else {
+//         console.log(result);
+//         return res
+//           .status(201)
+//           .json({ msg: `marks uploaded successfully`, data: result });
+//       }
+//     }
+//   );
+// });
+
+//====================Set User Score in DB end====================
+
+//====================Get user test history======================
+
+app.get("/api/getTestHistory/:user_id", (req, res) => {
+  con.query(
+    `select m.user_id, p.paper_name, qp.year, m.score, m.attempt_no from marks m inner join question_paper qp on m.paper_id=qp.qp_id inner join papers p on qp.p_id = p.ppr_id where m.user_id = ${req.params.user_id}`,
+
+    // `select * from marks m where m.user_id = ${req.params.user_id}`,
+    (err, result) => {
+      if (err) console.log(err);
+      else {
+        console.log(result);
+        return res.status(200).json(result);
+      }
+    }
+  );
+});
+
+//====================Get user test history end====================
 
 // All Apis
 
@@ -59,8 +162,13 @@ app.get(`/api/getQuesPaperDetail/:id`, (req, res) => {
   con.query(
     `select distinct p.ppr_id, p.paper_name, p.total_ques, p.total_marks, p.total_time from papers p inner join question_paper qp on  p.ppr_id=qp.p_id where p.ppr_id=${req.params.id}`,
     (err, result) => {
-      if (err) res.send(err);
-      return res.send(result);
+      if (err) {
+        console.log(err);
+        res.send(err);
+      } else {
+        console.log(result);
+        return res.send(result);
+      }
     }
   );
 });
@@ -86,7 +194,8 @@ const groupBy = (array, key) => {
 };
 
 // get questions of currentPaper
-app.get(`/api/getPaper/:id`, (req, res) => {
+app.get(`/api/getPaper/:id`, checkToken, (req, res) => {
+  console.log("======check token ==========", checkToken);
   con.query(
     `select ques.qid, ques.question, ques.options, s.section_name from ques_in_quespaper qp  
     inner join questions ques on qp.ques_id=ques.qid 
@@ -123,7 +232,7 @@ app.get("/api/getAnswerKey/:id", (req, res) => {
 });
 
 // get score api
-
+let answer_key;
 let result = {
   sec_wise_score: {},
   sec_wise_attempt: {},
@@ -134,18 +243,19 @@ let result = {
   total_ques: 0,
 };
 
-app.post(`/api/calculateScore`, (req, response) => {
+app.post(`/api/calculateScore`, async (req, response) => {
   const answer = req.body.ans;
   console.log("user ans ====", answer);
-  const id = req.body.id;
+  const { id, user_id } = req.body;
 
   const total_no_of_ques = Object.keys(answer).length;
 
-  axios
+  await axios
     .get(`http://localhost:8080/api/getAnswerKey/${id}`)
     .then((res) => {
       console.log("anskey=====", res.data);
-      const answer_key = res.data;
+
+      answer_key = res.data;
 
       result.total_ques = total_no_of_ques;
 
@@ -203,10 +313,27 @@ app.post(`/api/calculateScore`, (req, response) => {
 
       console.log("result======", result);
 
-      response.send(result);
+      // response.send(result);
     })
 
-    .catch((err) => res.send(err));
+    .catch((err) => response.send(err));
+
+  console.log("score 1 kyu", result.total_score);
+  con.query(
+    `insert into marks (user_id, paper_id, score, attempt_no) values (?, ?, ?, ?)`,
+    [user_id, id, result.total_score, new Date()],
+    (err, result) => {
+      if (err) {
+        console.log(err);
+        return response.status(400).json({ err: "Invalid data" });
+      } else {
+        console.log(result);
+        return response
+          .status(201)
+          .json({ msg: `marks uploaded successfully`, data: result });
+      }
+    }
+  );
 });
 
 app.get("/api/getScore", (req, res) => {
