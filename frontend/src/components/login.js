@@ -6,6 +6,7 @@ import NavBar from "./navbar";
 
 const LoginPage = () => {
   const history = useHistory();
+  const [loginErr, setLoginErr] = useState("");
 
   const [details, setDetails] = useState({ email: null, password: null });
 
@@ -26,7 +27,9 @@ const LoginPage = () => {
         history.push("/");
       })
       .catch((err) => {
-        console.log(err);
+        console.log(err.response.data.err);
+        const error = err.response.data.err;
+        setLoginErr(error);
       });
   };
 
@@ -52,6 +55,12 @@ const LoginPage = () => {
               />
             </div>
             <div class="col-md-8 col-lg-6 col-xl-4 offset-xl-1">
+              {loginErr ? (
+                <div class="alert alert-danger" role="alert">
+                  {loginErr}
+                </div>
+              ) : null}
+
               <form class="">
                 <div class="pt-1 d-flex flex-row align-items-center justify-content-center justify-content-lg-start">
                   <p class="lead fw-normal mb-0 me-3">Sign in with</p>

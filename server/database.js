@@ -85,7 +85,7 @@ app.post(`/auth/login`, (req, res) => {
       if (err) {
         return res.json({ err });
       }
-      if (!result) {
+      if (result[0] == null) {
         return res.status(403).json({ err: "Invalid Credential!!!" });
       }
 
@@ -106,7 +106,7 @@ app.post(`/auth/login`, (req, res) => {
           token: jsontoken,
         });
       } else {
-        return res.json({ msg: "Invalid email or password!!!" });
+        return res.status(403).json({ err: "Invalid email or password!!!" });
       }
     }
   );
