@@ -54,7 +54,7 @@ const SignUpPage = (props) => {
       })
       .catch((err) => {
         console.log(err);
-        // setSqlerr(err.response.data.err);
+        setSqlerr(err.response.data.err);
         // return;
         // console.log(err);
       });
@@ -153,6 +153,7 @@ const SignUpPage = (props) => {
                   <input
                     type="password"
                     // id="form3Example4"
+                    minlength="8"
                     name="password"
                     class="form-control form-control"
                     placeholder="Password"
@@ -165,6 +166,7 @@ const SignUpPage = (props) => {
                 <div class="form-outline mb-3">
                   <input
                     type="password"
+                    minlength="8"
                     // id="form3Example4"
                     name="confirm_password"
                     class="form-control form-control"

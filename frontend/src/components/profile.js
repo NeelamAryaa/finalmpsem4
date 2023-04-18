@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import NavBar from "./navbar";
 import axios from "axios";
+import dayjs from "dayjs";
 
 const Profile = () => {
   const [testHistory, setTestHistory] = useState([]);
@@ -10,10 +11,18 @@ const Profile = () => {
       .get(
         `http://localhost:8080/api/getTestHistory/${
           JSON.parse(localStorage.getItem("login")).user_id
-        }`
+        }`,
+        {
+          headers: {
+            Authorization:
+              "Bearer " + JSON.parse(localStorage.getItem("login")).token,
+          },
+        }
       )
       .then((response) => {
         console.log(response);
+
+        console.log(response.data);
         setTestHistory(response.data);
       })
       .catch((err) => console.log(err));
@@ -25,7 +34,7 @@ const Profile = () => {
       <div className="container text-center fs-3 m-auto my-4 w-100">
         Test History
       </div>
-      <table class="table m-auto w-75 text-center">
+      <table class="table m-auto w-75 text-center  table-bordered ">
         <thead>
           <tr>
             {/* <th scope="col">#</th> */}
@@ -44,7 +53,9 @@ const Profile = () => {
                   <td>{test.paper_name}</td>
                   <td>{test.year}</td>
                   <td>{test.score}</td>
-                  <td>{test.attempt_no}</td>
+                  <td>
+                    {dayjs(test.attempt_no).format("YYYY-MM-DD HH:mm:ss A")}
+                  </td>
                 </tr>
               ))}
         </tbody>

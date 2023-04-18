@@ -62,7 +62,7 @@ const LoginPage = () => {
               ) : null}
 
               <form class="">
-                <div class="pt-1 d-flex flex-row align-items-center justify-content-center justify-content-lg-start">
+                {/* <div class="pt-1 d-flex flex-row align-items-center justify-content-center justify-content-lg-start">
                   <p class="lead fw-normal mb-0 me-3">Sign in with</p>
                   <button
                     type="button"
@@ -70,11 +70,11 @@ const LoginPage = () => {
                   >
                     <i class="fa fa-google"></i>
                   </button>
-                </div>
-
+                </div> */}
+                {/* 
                 <div class="divider d-flex align-items-center my-4">
                   <p class="text-center fw-bold mx-3 mb-0">Or</p>
-                </div>
+                </div> */}
 
                 {/* <!-- Email input --> */}
                 <div class="form-outline mb-3">
@@ -94,6 +94,7 @@ const LoginPage = () => {
                   <input
                     type="password"
                     // id="form3Example4"
+                    minlength="8"
                     name="password"
                     class="form-control form-control"
                     placeholder="Enter password"

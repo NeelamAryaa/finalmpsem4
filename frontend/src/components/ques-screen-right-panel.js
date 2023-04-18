@@ -19,7 +19,13 @@ const QuesScreenRightPanel = (props) => {
         {
           headers: {
             "Content-Type": "application/json",
+            Authorization:
+              "Bearer " + JSON.parse(localStorage.getItem("login")).token,
           },
+          // headers: {
+          //   Authorization:
+          //     "Bearer " + JSON.parse(localStorage.getItem("login")).token,
+          // },
         }
       )
       .then((response) => {
@@ -43,14 +49,14 @@ const QuesScreenRightPanel = (props) => {
 
   return (
     <div className="col-3 p-0 border-start">
-      <div className="row mx-0 text-primary">
+      {/* <div className="row mx-0 text-primary">
         <div className="col ps-3">
           <u>Question paper</u>
         </div>
         <div className="col">
           <u>Instruction</u>
         </div>
-      </div>
+      </div> */}
       <hr className="m-0" />
       <div className="row py-2 mx-0">
         <img
@@ -159,7 +165,7 @@ const QuesScreenRightPanel = (props) => {
             : null}
         </div>
       </div>
-      <div className="container-fluid text-center">
+      <div className="container-fluid text-center ">
         <Link to="/examsummary">
           <button
             type="button"

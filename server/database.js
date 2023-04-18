@@ -11,6 +11,7 @@ const { sign, verify, decode } = require("jsonwebtoken");
 dotenv.config({ path: "./.env" });
 
 const { createConnection } = require("mysql2");
+const dayjs = require("dayjs");
 
 const con = createConnection({
   host: process.env.DATABASE_HOST,
@@ -30,6 +31,7 @@ app.use(bodyParser.json());
 // middleware function
 
 checkToken = (req, res, next) => {
+  console.log(dayjs().format("YYYY-MM-DD HH:mm:ss A"));
   console.log("req body token", req.get("authorization"));
   let token = req.get("authorization");
   console.log("token", token);
@@ -96,7 +98,7 @@ app.post(`/auth/login`, (req, res) => {
       if (checkpwd) {
         result.password = undefined; //not want to send with res thats why!
         const jsontoken = sign({ checkpwd: result }, "keyhye", {
-          expiresIn: "5h",
+          expiresIn: "24h",
         });
 
         return res.json({
@@ -114,32 +116,9 @@ app.post(`/auth/login`, (req, res) => {
 
 // ================user_registration_login_ends================
 
-//====================Set User Score in DB====================
-// app.post("/api/storeMarks/:user_id", (req, res) => {
-//   const user_id = req.params.user_id;
-//   const { qp_id, score } = req.body;
-//   con.query(
-//     `insert into marks (user_id, paper_id, score, attempt_no) values (?, ?, ?, ?)`,
-//     [user_id, qp_id, score, new Date()],
-//     (err, result) => {
-//       if (err) {
-//         console.log(err);
-//         return res.status(400).json({ err: "Invalid data" });
-//       } else {
-//         console.log(result);
-//         return res
-//           .status(201)
-//           .json({ msg: `marks uploaded successfully`, data: result });
-//       }
-//     }
-//   );
-// });
-
-//====================Set User Score in DB end====================
-
 //====================Get user test history======================
 
-app.get("/api/getTestHistory/:user_id", (req, res) => {
+app.get("/api/getTestHistory/:user_id", checkToken, (req, res) => {
   con.query(
     `select m.user_id, p.paper_name, qp.year, m.score, m.attempt_no from marks m inner join question_paper qp on m.paper_id=qp.qp_id inner join papers p on qp.p_id = p.ppr_id where m.user_id = ${req.params.user_id}`,
 
@@ -158,7 +137,7 @@ app.get("/api/getTestHistory/:user_id", (req, res) => {
 
 // All Apis
 
-app.get(`/api/getQuesPaperDetail/:id`, (req, res) => {
+app.get(`/api/getQuesPaperDetail/:id`, checkToken, (req, res) => {
   con.query(
     `select distinct p.ppr_id, p.paper_name, p.total_ques, p.total_marks, p.total_time from papers p inner join question_paper qp on  p.ppr_id=qp.p_id where p.ppr_id=${req.params.id}`,
     (err, result) => {
@@ -243,7 +222,7 @@ let result = {
   total_ques: 0,
 };
 
-app.post(`/api/calculateScore`, async (req, response) => {
+app.post(`/api/calculateScore`, checkToken, async (req, response) => {
   const answer = req.body.ans;
   console.log("user ans ====", answer);
   const { id, user_id } = req.body;
@@ -318,7 +297,7 @@ app.post(`/api/calculateScore`, async (req, response) => {
 
     .catch((err) => response.send(err));
 
-  console.log("score 1 kyu", result.total_score);
+  // console.log("score 1 kyu", result.total_score);
   con.query(
     `insert into marks (user_id, paper_id, score, attempt_no) values (?, ?, ?, ?)`,
     [user_id, id, result.total_score, new Date()],
@@ -339,91 +318,6 @@ app.post(`/api/calculateScore`, async (req, response) => {
 app.get("/api/getScore", (req, res) => {
   res.send(result);
 });
-
-// ===============previous code===================
-// const groupBy = (array, key) => {
-//   return array.reduce((result, currentValue) => {
-//     (result[currentValue[key]] = result[currentValue[key]] || []).push(
-//       currentValue
-//     );
-//     return result;
-//   }, {});
-// };
-
-// app.get(`/api/getPaper/:id`, (req, res) => {
-//   con.query(
-//     `select q.qid, q.question, q.option1, q.option2, q.option3, q.option4, q.options, s.section_name from questions q
-//     inner join sections s on q.section_id=s.id and q.qpaper_id=${req.params.id} `,
-//     (err, rslt) => {
-//       if (err) console.log(err);
-
-//       const r = groupBy(rslt, "section_name");
-//       // console.log(r);
-
-//       res.send(r);
-//     }
-//   );
-// });
-
-// app.get(`/api/getSections/:id`, (req, res) => {
-//   con.query(
-//     `select s.section_name as section from sections s where s.paper_id=${req.params.id}`,
-//     (err, result) => {
-//       if (err) console.log(err);
-//       res.send(result);
-//     }
-//   );
-// });
-// // ===============previous code ends===================
-
-// ===============================================
-// app.get(`/api/getPaper/:id`, (req, res) => {
-//   con.query(
-//     `select q.qid, q.question, q.option1, q.option2, q.option3, q.option4, s.section_name from questions q
-//     inner join sections s on q.section_id=s.id and q.paper_id=${req.params.id} `,
-//     (err, result) => {
-//       if (err) console.log(err);
-
-//       res.send(result);
-//     }
-//   );
-// });
-
-// app.get(`/api/getPaper/:id`, (req, res) => {
-//   con.query(
-//     `select q.qid, q.question, q.option1, q.option2, q.option3, q.option4, s.section_name from questions q
-//     inner join sections s on q.section_id=s.id and q.paper_id=${req.params.id} `,
-//     (err, result) => {
-//       if (err) console.log(err);
-
-//       // send paper as required format
-//       console.log("section in getSection ", section.data);
-
-//       res.send(result);
-//     }
-//   );
-// });
-
-// app.get("/api/getAllQuestions", (req, res) => {
-//   con.query(`select * from questions`, (err, result) => {
-//     if (err) console.log(err);
-//     // res.send("yes it working");
-//     res.send(result);
-//   });
-//   // res.send("show result");
-//   console.log("result");
-// });
-
-// initial testing
-// con.query(`select * from questions`, (err, res, fields) => {
-//   if (err) {
-//     return console.log(err);
-//   }
-//   return console.log(res);
-// });
-
-// module.exports = con;
-// =====================================================
 
 app.listen(8080, "0.0.0.0", (err) => {
   if (err) console.log(err);

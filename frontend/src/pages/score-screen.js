@@ -39,7 +39,13 @@ const ScoreScreen = (props) => {
 
   const getScore = async () => {
     await axios
-      .get(`http://localhost:8080/api/getScore/`)
+      .get(
+        `http://localhost:8080/api/getScore/`
+        // , {
+        //   Authorization:
+        //     "Bearer " + JSON.parse(localStorage.getItem("login")).token,
+        // }
+      )
       .then((response) => {
         console.log("calfn======", response.data);
         const result = response.data;
@@ -65,7 +71,15 @@ const ScoreScreen = (props) => {
     console.log(props);
     console.log(props.PaperTypeID);
     axios
-      .get(`http://localhost:8080/api/getQuesPaperDetail/${props.PaperTypeID}`)
+      .get(
+        `http://localhost:8080/api/getQuesPaperDetail/${props.PaperTypeID}`,
+        {
+          headers: {
+            Authorization:
+              "Bearer " + JSON.parse(localStorage.getItem("login")).token,
+          },
+        }
+      )
       .then((res) => {
         console.log(res.data[0]);
         setPaperDetail(res.data[0]);
@@ -177,7 +191,7 @@ const ScoreScreen = (props) => {
             </div>
           </div>
         </div>
-        <div className="col mb-4">
+        {/* <div className="col mb-4">
           <div className="border-3 border-start border-success shadow h-100 py-2">
             <div className="card-body">
               <div className="row no-gutters align-items-center">
@@ -200,7 +214,7 @@ const ScoreScreen = (props) => {
               </div>
             </div>
           </div>
-        </div>
+        </div> */}
         <div className="col mb-4">
           <div className="border-3 border-start border-danger shadow h-100 py-2">
             <div className="card-body ">
@@ -230,7 +244,7 @@ const ScoreScreen = (props) => {
         <div className="card-body">
           <div class="row">
             <div class="col mb-4 px-4">
-              <div class="card h-100 py-2 border-0">
+              <div class="card h-100 py-2 border-0 shadow">
                 <div class="card-body">
                   <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
@@ -259,7 +273,7 @@ const ScoreScreen = (props) => {
               </div>
             </div>
             <div class="col mb-4 px-4">
-              <div class="card h-100 py-2 border-0">
+              <div class="card h-100 py-2 border-0 shadow">
                 <div class="card-body">
                   <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
@@ -288,7 +302,7 @@ const ScoreScreen = (props) => {
               </div>
             </div>
             <div class="col mb-4 px-4">
-              <div class="card h-100 py-2 border-0">
+              <div class="card h-100 py-2 border-0 shadow">
                 <div class="card-body">
                   <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
@@ -315,7 +329,7 @@ const ScoreScreen = (props) => {
                 </div>
               </div>
             </div>
-            <div class="col mb-4 px-4">
+            {/* <div class="col mb-4 px-4">
               <div class="card h-100 py-2 border-0">
                 <div class="card-body">
                   <div class="row no-gutters align-items-center">
@@ -341,7 +355,7 @@ const ScoreScreen = (props) => {
                   </div>
                 </div>
               </div>
-            </div>
+            </div> */}
           </div>
 
           <div className="p-3">

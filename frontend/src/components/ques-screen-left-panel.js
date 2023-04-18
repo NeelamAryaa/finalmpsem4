@@ -89,7 +89,7 @@ class QuesScreenLeftPanel extends Component {
           >
             {Object.keys(this.props.questions).map((section) => (
               <div
-                className={`btn col rounded-pill text-capitalize cursor-pointer fs-5 ${
+                className={`btn col  text-capitalize cursor-pointer fs-5 ${
                   section === this.props.currentSection
                     ? "bg-primary text-white"
                     : "text-primary "
@@ -104,7 +104,7 @@ class QuesScreenLeftPanel extends Component {
         <hr className="m-0" />
         <div class="row px-3">
           <div class="col text-start text-danger">Question type : MCQ</div>
-          <div class="col text-end">Time left : 01:23:44</div>
+          {/* <div class="col text-end">Time left : 01:23:44</div> */}
         </div>
         <hr className="m-0" />
         <div
