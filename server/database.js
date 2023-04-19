@@ -5,6 +5,7 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 const axios = require("axios");
 const PORT = process.env.PORT || 8080;
+const BASE_URL = process.env.BASE_URL;
 
 const { genSaltSync, hashSync, compareSync } = require("bcrypt");
 const { sign, verify, decode } = require("jsonwebtoken");
@@ -227,7 +228,7 @@ app.post(`/api/calculateScore`, checkToken, async (req, response) => {
   const total_no_of_ques = Object.keys(answer).length;
 
   await axios
-    .get(`http://localhost:8080/api/getAnswerKey/${id}`)
+    .get(`${BASE_URL}/api/getAnswerKey/${id}`)
     .then((res) => {
       console.log("anskey=====", res.data);
 
