@@ -4,11 +4,10 @@
   "description": "",
   "main": "database.js",
   "scripts": {
-    "start": "node server/database.js",
+    "start": "node database.js",
     "devStart": "nodemon database.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "npm i"
-
   },
   "author": "",
   "license": "ISC",

@@ -4,6 +4,7 @@ const dotenv = require("dotenv");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const axios = require("axios");
+const PORT = process.env.PORT || 8080;
 
 const { genSaltSync, hashSync, compareSync } = require("bcrypt");
 const { sign, verify, decode } = require("jsonwebtoken");
@@ -258,11 +259,11 @@ app.post(`/api/calculateScore`, checkToken, async (req, response) => {
         sec_wise_score.push({ [key]: score });
         sec_wise_attempt.push({ [key]: attempt });
         // result.push({ sec_wise_attempt: { [key]: attempt } });
-        console.log(
-          "sec_wise_attempt@@@@@@@@@@@@@",
-          sec_wise_score,
-          sec_wise_attempt
-        );
+        // console.log(
+        //   "sec_wise_attempt@@@@@@@@@@@@@",
+        //   sec_wise_score,
+        //   sec_wise_attempt
+        // );
 
         result.sec_wise_attempt = sec_wise_attempt;
         result.sec_wise_score = sec_wise_score;
@@ -315,7 +316,7 @@ app.get("/api/getScore", (req, res) => {
   res.send(result);
 });
 
-app.listen(8080, "0.0.0.0", (err) => {
+app.listen(PORT, "0.0.0.0", (err) => {
   if (err) console.log(err);
   console.log("app is running on 8080");
 });
