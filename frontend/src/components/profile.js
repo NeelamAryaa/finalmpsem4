@@ -37,7 +37,6 @@ const Profile = () => {
       <table class="table m-auto w-75 text-center  table-bordered ">
         <thead>
           <tr>
-            {/* <th scope="col">#</th> */}
             <th scope="col">Paper</th>
             <th scope="col">Year</th>
             <th scope="col">Score</th>
@@ -49,35 +48,15 @@ const Profile = () => {
             ? null
             : testHistory.map((test, idx) => (
                 <tr key={idx}>
-                  {/* <th scope="row">2</th> */}
                   <td>{test.paper_name}</td>
                   <td>{test.year}</td>
                   <td>{test.score}</td>
                   <td>
-                    {dayjs(test.attempt_no).format("YYYY-MM-DD HH:mm:ss A")}
+                    {dayjs(test.attempt_no).format("DD-MM-YYYY HH:mm:ss A")}
                   </td>
                 </tr>
               ))}
         </tbody>
-        {/* <tbody>
-          <tr>
-            
-            <td>Mark</td>
-            <td>Otto</td>
-            <td>@mdo</td>
-          </tr>
-          <tr>
-            
-            <td>Jacob</td>
-            <td>Thornton</td>
-            <td>@fat</td>
-          </tr>
-          <tr>
-            
-            <td colspan="2">Larry the Bird</td>
-            <td>@twitter</td>
-          </tr>
-        </tbody> */}
       </table>
     </>
   );

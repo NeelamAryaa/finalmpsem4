@@ -3,7 +3,6 @@ import { Doughnut } from "react-chartjs-2";
 
 import { connect } from "react-redux";
 import axios from "axios";
-// import { SetScore } from "../redux/question/question.actions";
 
 import NavBar from "../components/navbar";
 
@@ -39,13 +38,7 @@ const ScoreScreen = (props) => {
 
   const getScore = async () => {
     await axios
-      .get(
-        `http://localhost:8080/api/getScore/`
-        // , {
-        //   Authorization:
-        //     "Bearer " + JSON.parse(localStorage.getItem("login")).token,
-        // }
-      )
+      .get(`http://localhost:8080/api/getScore/`)
       .then((response) => {
         console.log("calfn======", response.data);
         const result = response.data;
@@ -88,18 +81,6 @@ const ScoreScreen = (props) => {
         console.log(err);
       });
   }, []);
-
-  // const getPaperDetail = () => {
-  //   axios
-  //     .get(`http://localhost:8080/api/getQuesPaperDetail/${props.PaperTypeID}`)
-  //     .then((res) => {
-  //       // console.log(res.data);
-  //       setPaperDetail(res.data);
-  //     })
-  //     .catch((err) => {
-  //       console.log(err);
-  //     });
-  // };
 
   return (
     <>
@@ -191,30 +172,7 @@ const ScoreScreen = (props) => {
             </div>
           </div>
         </div>
-        {/* <div className="col mb-4">
-          <div className="border-3 border-start border-success shadow h-100 py-2">
-            <div className="card-body">
-              <div className="row no-gutters align-items-center">
-                <div className="col mr-2">
-                  <div className="text-xs font-weight-bold text-success text-uppercase mb-1 ">
-                    Rank (AIR)
-                  </div>
-                  <div className="h5 mb-0 font-weight-bold text-gray-800">
-                    <span>RANK</span>
-                    <span> / </span>
-                    <span>USERS</span>
-                  </div>
-                </div>
-                <div className="col-auto">
-                  <i
-                    className="fa fa-list-ol text-gray-300"
-                    style={{ color: "#cfd1d3", fontSize: "24px" }}
-                  ></i>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div> */}
+
         <div className="col mb-4">
           <div className="border-3 border-start border-danger shadow h-100 py-2">
             <div className="card-body ">
@@ -329,33 +287,6 @@ const ScoreScreen = (props) => {
                 </div>
               </div>
             </div>
-            {/* <div class="col mb-4 px-4">
-              <div class="card h-100 py-2 border-0">
-                <div class="card-body">
-                  <div class="row no-gutters align-items-center">
-                    <div class="col mr-2">
-                      <div class="text-warning font-weight-light text-uppercase mb-1 ">
-                        Time/Ques
-                      </div>
-                      <div class="h5 mb-0 font-weight-lightbold text-gray-700">
-                        <span>time = 0 Min 18 Sec</span>
-                      </div>
-                    </div>
-                    <div class="col-auto">
-                      <div class="text-warning">
-                        <span class="fa-stack fa-2x">
-                          <i
-                            class="fa fa-circle fa-stack-2x"
-                            style={{ opacity: "0.2" }}
-                          ></i>
-                          <i class="fa fa-hourglass-half fa-stack-1x"></i>
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div> */}
           </div>
 
           <div className="p-3">

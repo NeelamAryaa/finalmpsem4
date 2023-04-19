@@ -92,30 +92,6 @@ const SignUpPage = (props) => {
                 ) : null}
 
                 {success ? (
-                  // (
-                  // <div
-                  //   class="toast"
-                  //   role="alert"
-                  //   aria-live="assertive"
-                  //   aria-atomic="true"
-                  // >
-                  //   <div class="toast-header">
-                  //     <img src="..." class="rounded me-2" alt="..." />
-                  //     <strong class="me-auto">Bootstrap</strong>
-                  //     <small>11 mins ago</small>
-                  //     <button
-                  //       type="button"
-                  //       class="btn-close"
-                  //       data-bs-dismiss="toast"
-                  //       aria-label="Close"
-                  //     ></button>
-                  //   </div>
-                  //   <div class="toast-body">
-                  //     Hello, world! This is a toast message.
-                  //   </div>
-                  // </div>
-                  // ) :
-
                   <div class="alert alert-success" role="alert">
                     {success}
                   </div>
@@ -124,7 +100,6 @@ const SignUpPage = (props) => {
                 <div class="form-outline mb-3">
                   <input
                     type="text"
-                    // id="name"
                     name="username"
                     class="form-control form-control"
                     placeholder="Username"
@@ -134,11 +109,9 @@ const SignUpPage = (props) => {
                   />
                 </div>
 
-                {/* <!-- Email input --> */}
                 <div class="form-outline mb-3">
                   <input
                     type="email"
-                    // id="form3Example3"
                     name="email"
                     class="form-control form-control"
                     placeholder="Email address"
@@ -148,11 +121,9 @@ const SignUpPage = (props) => {
                   />
                 </div>
 
-                {/* <!-- Password input --> */}
                 <div class="form-outline mb-3">
                   <input
                     type="password"
-                    // id="form3Example4"
                     minlength="8"
                     name="password"
                     class="form-control form-control"
@@ -167,7 +138,6 @@ const SignUpPage = (props) => {
                   <input
                     type="password"
                     minlength="8"
-                    // id="form3Example4"
                     name="confirm_password"
                     class="form-control form-control"
                     placeholder="Confirm password"
@@ -178,12 +148,7 @@ const SignUpPage = (props) => {
                 </div>
 
                 <div class="text-center text-lg-start mt-4 pt-2">
-                  <button
-                    type="submit"
-                    class="btn btn-primary btn"
-                    // style="padding-left: 2.5rem; padding-right: 2.5rem;"
-                    // onClick={onSubmitHandler}
-                  >
+                  <button type="submit" class="btn btn-primary btn">
                     Sign Up
                   </button>
                 </div>

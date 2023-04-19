@@ -26,10 +26,7 @@ app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-// app.use("/auth", require(""));
-
 // middleware function
-
 checkToken = (req, res, next) => {
   console.log(dayjs().format("YYYY-MM-DD HH:mm:ss A"));
   console.log("req body token", req.get("authorization"));
@@ -185,7 +182,6 @@ app.get(`/api/getPaper/:id`, checkToken, (req, res) => {
       // console.log("aise aa rha ====", result);
 
       const rsult = groupBy(result, "section_name");
-      // console.log(r);
 
       return res.send(rsult);
     }

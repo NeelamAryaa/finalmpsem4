@@ -19,7 +19,6 @@ const NavBar = () => {
 
   return (
     <nav className="navbar navbar-dark " style={{ backgroundColor: "#29385c" }}>
-      {/* <div className="container-fluid"> */}
       <div className="container-fluid d-flex mw-100">
         <a className="navbar-brand" href="/cbt">
           Computer Based Test
@@ -57,7 +56,6 @@ const NavBar = () => {
           </div>
         )}
       </div>
-      {/* </div> */}
     </nav>
   );
 };
