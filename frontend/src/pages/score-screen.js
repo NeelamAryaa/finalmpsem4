@@ -40,7 +40,7 @@ const ScoreScreen = (props) => {
     await axios
       .get(`http://localhost:8080/api/getScore/`)
       .then((response) => {
-        console.log("calfn======", response.data);
+        console.log("calfn======", response);
         const result = response.data;
         setResult(response.data);
         const correct = result.total_score;

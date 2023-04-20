@@ -210,7 +210,7 @@ app.get("/api/getAnswerKey/:id", (req, res) => {
 
 // get score api
 let answer_key;
-let result = {
+const result = {
   sec_wise_score: {},
   sec_wise_attempt: {},
   total_attempt: -1,
@@ -220,6 +220,99 @@ let result = {
   total_ques: 0,
 };
 
+// app.post(`/api/calculateScore`, checkToken, async (req, response) => {
+//   const answer = req.body.ans;
+//   console.log("user ans ====", answer);
+//   const { id, user_id } = req.body;
+
+//   const total_no_of_ques = Object.keys(answer).length;
+
+//   await axios
+//     .get(`${BASE_URL}/api/getAnswerKey/${id}`)
+//     .then((res) => {
+//       console.log("anskey=====", res.data);
+
+//       answer_key = res.data;
+
+//       result.total_ques = total_no_of_ques;
+
+//       let sec_wise_score = [];
+//       let sec_wise_attempt = [];
+//       let t_score = 0;
+//       let t_attempt = 0;
+
+//       const keys = Object.keys(answer_key);
+//       keys.forEach((key, idx) => {
+//         let score = 0;
+//         let attempt = 0;
+
+//         answer_key[key].forEach((e) => {
+//           console.log(answer[e.qid]);
+//           if (answer[e.qid] + 1 == e.answer) {
+//             score += 1;
+//           }
+//           if (answer[e.qid] !== -1) {
+//             attempt += 1;
+//           }
+//         });
+//         // result[0].sec_wise_score=({ [key]: score });
+//         // result[1].sec_wise_attempt.push({ [key]: attempt });
+//         sec_wise_score.push({ [key]: score });
+//         sec_wise_attempt.push({ [key]: attempt });
+//         // result.push({ sec_wise_attempt: { [key]: attempt } });
+//         // console.log(
+//         //   "sec_wise_attempt@@@@@@@@@@@@@",
+//         //   sec_wise_score,
+//         //   sec_wise_attempt
+//         // );
+
+//         result.sec_wise_attempt = sec_wise_attempt;
+//         result.sec_wise_score = sec_wise_score;
+
+//         t_score += result.sec_wise_score[idx][key];
+//         t_attempt += result.sec_wise_attempt[idx][key];
+//       });
+
+//       result.total_score = t_score;
+//       result.total_attempt = t_attempt;
+
+//       const accuracy =
+//         (result.total_score /
+//           (result.total_attempt ? result.total_attempt : -1)) *
+//         100;
+//       result.accuracy = accuracy.toFixed(2);
+
+//       const percent = (
+//         (result.total_score / (total_no_of_ques ? total_no_of_ques : -1)) *
+//         100
+//       ).toFixed(2);
+//       result.percentage = percent;
+
+//       console.log("result======", result);
+
+//       // response.send(result);
+//     })
+
+//     .catch((err) => response.send(err));
+
+//   // console.log("score 1 kyu", result.total_score);
+//   con.query(
+//     `insert into marks (user_id, paper_id, score, attempt_no) values (?, ?, ?, ?)`,
+//     [user_id, id, result.total_score, new Date()],
+//     (err, result) => {
+//       if (err) {
+//         console.log(err);
+//         return response.status(400).json({ err: "Invalid data" });
+//       } else {
+//         console.log(result);
+//         return response
+//           .status(201)
+//           .json({ msg: `marks uploaded successfully`, data: result });
+//       }
+//     }
+//   );
+// });
+
 app.post(`/api/calculateScore`, checkToken, async (req, response) => {
   const answer = req.body.ans;
   console.log("user ans ====", answer);
@@ -227,12 +320,18 @@ app.post(`/api/calculateScore`, checkToken, async (req, response) => {
 
   const total_no_of_ques = Object.keys(answer).length;
 
-  await axios
-    .get(`${BASE_URL}/api/getAnswerKey/${id}`)
-    .then((res) => {
-      console.log("anskey=====", res.data);
+  con.query(
+    `select ques.qid, s.section_name, ques.answer from ques_in_quespaper qp 
+    inner join questions ques on qp.ques_id=ques.qid 
+    inner join section s on ques.sec_id=s.id
+    where qp.q_ppr_id=${id}`,
+    (err, rslt) => {
+      if (err) return response.send(err);
+      console.log(rslt);
+      const rsult = groupBy(rslt, "section_name");
+      // console.log(r);
 
-      answer_key = res.data;
+      answer_key = rsult;
 
       result.total_ques = total_no_of_ques;
 
@@ -255,16 +354,9 @@ app.post(`/api/calculateScore`, checkToken, async (req, response) => {
             attempt += 1;
           }
         });
-        // result[0].sec_wise_score=({ [key]: score });
-        // result[1].sec_wise_attempt.push({ [key]: attempt });
+
         sec_wise_score.push({ [key]: score });
         sec_wise_attempt.push({ [key]: attempt });
-        // result.push({ sec_wise_attempt: { [key]: attempt } });
-        // console.log(
-        //   "sec_wise_attempt@@@@@@@@@@@@@",
-        //   sec_wise_score,
-        //   sec_wise_attempt
-        // );
 
         result.sec_wise_attempt = sec_wise_attempt;
         result.sec_wise_score = sec_wise_score;
@@ -290,30 +382,27 @@ app.post(`/api/calculateScore`, checkToken, async (req, response) => {
 
       console.log("result======", result);
 
-      // response.send(result);
-    })
-
-    .catch((err) => response.send(err));
-
-  // console.log("score 1 kyu", result.total_score);
-  con.query(
-    `insert into marks (user_id, paper_id, score, attempt_no) values (?, ?, ?, ?)`,
-    [user_id, id, result.total_score, new Date()],
-    (err, result) => {
-      if (err) {
-        console.log(err);
-        return response.status(400).json({ err: "Invalid data" });
-      } else {
-        console.log(result);
-        return response
-          .status(201)
-          .json({ msg: `marks uploaded successfully`, data: result });
-      }
+      con.query(
+        `insert into marks (user_id, paper_id, score, attempt_no) values (?, ?, ?, ?)`,
+        [user_id, id, result.total_score, new Date()],
+        (err, res) => {
+          if (err) {
+            console.log(err);
+            return response.status(400).json({ err: "Invalid data" });
+          } else {
+            console.log(res);
+            return response
+              .status(201)
+              .json({ msg: `marks uploaded successfully`, data: res });
+          }
+        }
+      );
     }
   );
 });
 
 app.get("/api/getScore", (req, res) => {
+  console.log("getscore", result);
   res.send(result);
 });
 
