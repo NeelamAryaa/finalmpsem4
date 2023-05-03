@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useHistory } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 
 const NavBar = () => {
   const history = useHistory();
@@ -14,7 +14,13 @@ const NavBar = () => {
     console.log("onlogout");
     localStorage.removeItem("login");
     setLogout(true);
+    // console.log("pehle=====", history);
     history.push("/");
+    // console.log("baad me ======", history);
+    // window.addEventListener("popstate", (e) => {
+    //   // alert("Your data will be lost!!!");
+    //   history.go(1);
+    // });
   };
 
   return (
@@ -27,14 +33,21 @@ const NavBar = () => {
         {!localStorage.getItem("login") || logout ? (
           <div className="navbar-brand d-flex text-white justify-content-end">
             <div className="mx-3">
-              <a className="text-white" href="/auth/login">
+              {/* <a className="text-white" href="/auth/login"> */}
+              <Link to="/auth/login" className="text-white">
+                {" "}
                 Login
-              </a>
+              </Link>
+
+              {/* </a> */}
             </div>
             <div className="mx-1">
-              <a className="text-white" href="/auth/register">
+              {/* <a className="text-white" href="/auth/register"> */}
+              <Link to="/auth/register" className="text-white">
                 Sign Up
-              </a>
+              </Link>
+
+              {/* </a> */}
             </div>
           </div>
         ) : (

@@ -59,10 +59,10 @@ class QuestionsScreen extends Component {
 
     const { history } = this.props;
 
-    window.addEventListener("popstate", (e) => {
-      // alert("Your data will be lost!!!");
-      history.go(1);
-    });
+    // window.addEventListener("popstate", (e) => {
+    //   // alert("Your data will be lost!!!");
+    //   history.go(1);
+    // });
 
     window.addEventListener("beforeunload", this.handleBeforeUnload);
     return () => {

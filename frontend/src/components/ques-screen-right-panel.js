@@ -1,11 +1,13 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+// import { Link } from "react-router-dom";
 import { connect } from "react-redux";
-
 import axios from "axios";
+
+import { useHistory } from "react-router-dom";
 
 const QuesScreenRightPanel = (props) => {
   // const [score, setScore] = useState(0);
+  const history = useHistory();
 
   const calulateScore = async () => {
     await axios
@@ -33,6 +35,8 @@ const QuesScreenRightPanel = (props) => {
         // setScore(response.data.total_score);
       })
       .catch((err) => console.log("r=========", err));
+
+    history.replace("/examsummary");
 
     // await axios
     //   .post(
@@ -166,15 +170,13 @@ const QuesScreenRightPanel = (props) => {
         </div>
       </div>
       <div className="container-fluid text-center ">
-        <Link to="/examsummary">
-          <button
-            type="button"
-            className="btn btn-success my-3"
-            onClick={calulateScore}
-          >
-            Submit
-          </button>
-        </Link>
+        <button
+          type="button"
+          className="btn btn-success my-3"
+          onClick={calulateScore}
+        >
+          Submit
+        </button>
       </div>
     </div>
   );

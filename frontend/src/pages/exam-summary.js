@@ -1,8 +1,20 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import { Link } from "react-router-dom";
+import axios from "axios";
 
 class ExamSummary extends Component {
+  state = {
+    result: null,
+  };
+
+  componentDidMount = () => {
+    axios.get("http://localhost:8080/api/getScore/").then((res) => {
+      console.log(res.data);
+      this.setState({ result: res.data });
+    });
+  };
+
   getCount = (sec) => {
     const ques = this.props.Questions;
     let num_of_ans, num_of_visit, num_of_review;
@@ -42,7 +54,7 @@ class ExamSummary extends Component {
             <thead>
               <tr>
                 <th scope="col">Section name</th>
-                <th scope="col">Question no.</th>
+                <th scope="col">No. of Question</th>
                 <th scope="col">Answered</th>
                 <th scope="col">Not answered</th>
                 <th scope="col">Marked for review</th>
